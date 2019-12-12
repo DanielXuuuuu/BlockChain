@@ -12,7 +12,7 @@
     <Layout>
       <Header class="header-con">
         <header-bar :collapsed="collapsed" @on-coll-change="handleCollapsedChange">
-          <user :message-unread-count="unreadCount" :user-avatar="userAvatar"/>
+<!--          <user :message-unread-count="unreadCount" :user-avatar="userAvatar"/>-->
         </header-bar>
       </Header>
       <Content class="main-content-con">

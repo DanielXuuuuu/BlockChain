@@ -9,7 +9,23 @@
 
 <script>
     export default {
-        name: "index"
+        name: "index",
+        components:{
+
+        },
+        data:{
+
+        },
+        created() {
+            // this.getUserInfo().then(res => {
+            //     this.$router.push({
+            //         name: this.$config.homeName
+            //     })
+            // })
+        },
+        methods:{
+
+        }
     }
 </script>
 

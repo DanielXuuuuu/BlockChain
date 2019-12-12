@@ -4,13 +4,11 @@
     <Card>
       <p slot="title">历史交易</p>
       <Row>
-        <Col span="3">
+        <Col span="6">
           <Button type="primary" style="width: 100px;" @click="openAddModal">
             发起新交易
           </Button>
-        </Col>
-        <Col span="2">
-          <Button type="primary" style="width: 100px;" @click="openSettleModal">
+          <Button type="primary" style="width: 100px; margin-left: 20px;" @click="openSettleModal">
             结算
           </Button>
         </Col>
@@ -76,6 +74,31 @@
       </div>
     </Modal>
 
+    <!--Settlemodal-->
+    <Modal v-model="isSettle" @on-cancel="cancelModal" title="结算" width="800">
+      <Form :model="settleForm" ref="settleForm" :rules="rules"
+            :label-width="110">
+        <Card>
+          <Row>
+            <FormItem label="应收账款单据ID：" prop="receiptId">
+              <!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
+              <!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
+              <!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
+              <!--                    {{option.name}}-->
+              <!--                  </Option>-->
+              <!--                </Select>-->
+              <Input placeholder="请输入要结算的应收账款单据ID" clearable v-model="settleForm.receiptId"></Input>
+            </FormItem>
+          </Row>
+        </Card>
+      </Form>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="text" @click="cancelModal">取消</Button>
+        <Button type="primary" @click="doSettleReceipt">确认</Button>
+      </div>
+    </Modal>
+
   </div>
 </template>
 
@@ -89,6 +112,8 @@
                 // modal控制
                 isAdd: false,
                 isReceipt: false,
+                isSettle: false,
+
                 // 表头数据
                 columnsList: [
                     {
@@ -151,13 +176,13 @@
 
                 transactionData: [],
                 newTransactionForm: {},
+                settleForm: {},
                 transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
 
-                searchOption: {}, // 查询用参数
-                loading: false, // 远程查询时使用
-                loading1: false, // 远程查询时使用
-                loading2: false, // 远程查询时使用
-
+                // searchOption: {}, // 查询用参数
+                // loading: false, // 远程查询时使用
+                // loading1: false, // 远程查询时使用
+                // loading2: false, // 远程查询时使用
 
                 delId: {
                     ids: ''
@@ -170,7 +195,7 @@
         },
 
         created() {
-            // this.findSuggestionData()
+            // this.findTransactionData()
         },
 
         methods: {
@@ -183,13 +208,22 @@
                 this.isReceipt = true
             },
 
+            openSettleModal(){
+                this.isSettle = true
+            },
+
             doCreateNewTransaction(){
+
+            },
+
+            doSettleReceipt(){
 
             },
 
             cancelModal() {
                 this.isAdd = false
                 this.isReceipt = false
+                this.isSettle = false
 
             }
         }

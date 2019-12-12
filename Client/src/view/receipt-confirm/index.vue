@@ -28,7 +28,7 @@
       <Form :model="addForm" ref="addForm" :rules="rules" :label-width="110">
         <Card>
           <Row>
-            <FormItem label="应收账款单据id：" prop="receiptId">
+            <FormItem label="应收账款单据ID：" prop="receiptId">
               <!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
               <!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
               <!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
