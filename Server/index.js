@@ -15,6 +15,11 @@ console.log(config.privateKey)
 
 var contratRouter = require('./routes/contrat');
 var userRouter = require('./routes/user');
+var enterpriseRouter = require('./routes/enterprise');
+var financeApplyRouter = require('./routes/financeApply');
+var receiptRouter = require('./routes/receipt');
+var transactionRouter = require('./routes/transaction');
+var thirdPartyRouter = require('./routes/thirdParty');
 
 var app = express();
 
@@ -34,6 +39,11 @@ app.all('*',function(req,res,next) {
 // 合约相关接口
 app.use('/api/contrat', contratRouter);
 app.use('/api/user', userRouter);
+app.use('/api/enterprise', enterpriseRouter);
+app.use('/api/financeApply', financeApplyRouter);
+app.use('/api/receipt', receiptRouter);
+app.use('/api/transaction', transactionRouter);
+app.use('/api/thirdParty', thirdPartyRouter);
 
 
 // 404

@@ -10,9 +10,9 @@
         }
     ],
     "authentication": {
-        "key": "../../fisco/nodes/127.0.0.1/sdk/sdk.key",
-        "cert": "../../fisco/nodes/127.0.0.1/sdk/sdk.crt",
-        "ca": "../../fisco/nodes/127.0.0.1/sdk/ca.crt"
+        "key": "../../../fisco/nodes/127.0.0.1/sdk/sdk.key",
+        "cert": "../../../fisco/nodes/127.0.0.1/sdk/sdk.crt",
+        "ca": "../../../fisco/nodes/127.0.0.1/sdk/ca.crt"
     },
     "groupID": 1,
     "timeout": 10000

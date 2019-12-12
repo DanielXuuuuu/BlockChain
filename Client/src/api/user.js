@@ -1,4 +1,4 @@
-import axios from '@/libs/api.request'
+import { get, post } from '../libs/http'
 
 export const registerEnterprise = ({ userName, password }) => {
   const data = {
@@ -18,19 +18,12 @@ export const registerThirdParty = ({ userName, password }) => {
     password
   }
   return axios.request({
-    url: 'login',
+    url: 'api',
     data,
     method: 'post'
   })
 }
 
-export const getUserInfo = () => {
-  return axios.request({
-    url: 'get_info',
-    params: {
-    },
-    method: 'get'
-  })
+export function getUserInfo(params) {
+  return fetch('/api/user/detail', params)
 }
-
-

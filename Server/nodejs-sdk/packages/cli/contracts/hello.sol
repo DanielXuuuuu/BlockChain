@@ -1,8 +1,6 @@
-pragma solidity >=0.4.22 <0.6.0;
+pragma solidity ^0.4.23;
 
-// import "./Table.sol";
-
-contract test1 {
+contract hello {
 
     /*------------------------------------------ 结构体定义 --------------------------------------------*/
 
@@ -55,7 +53,7 @@ contract test1 {
     }
 
     // 融资结构体定义
-    struct Finacing {
+    struct Financing {
         uint256 id;                 // 融资hash值
         address enterprise;         // 融资申请者
         address bank;               // 金融机构（银行）
@@ -70,8 +68,7 @@ contract test1 {
     mapping (address => ThirdParty) public thirdParties;            // 第三方
     mapping (uint256 => Transaction) public transactions;           // 交易
     mapping (uint256 => Receipt) public receipts;                   // 单据及其转让记录(转让记录包含在单据结构体中)
-    mapping (uint256 => Finacing) public financings;                // 融资记录
-    // mapping (uint256 => Receipt) public settlements;                // 结算记录，结算记录归并到单据中
+    mapping (uint256 => Financing) public financings;               // 融资记录
 
     // 所有注册用户
     address[] public users;
@@ -82,16 +79,8 @@ contract test1 {
 
     constructor() public {
         owner = msg.sender;
-        // createTables();
     }
 
-    // // 创建需要用到的表,把数据存入数据库可以方便后期的查询
-    // function createTables() private {
-    //     TableFactory tf = TableFactory(0x1001);
-    //     tf.createTable("Transaction", "enterpriseAddr", "isSeller, info, transactionTime, receiptId, isSettled");
-    //     tf.createTable("CoreRequst", "bankAddr", "enterpriseAddr, isAccept");
-    //     tf.createTable("receiptRequst", "", "enterpriseAddr, isAccept");
-    // }
 
     // 事件定义
     // 由于更改合约中数据的结果都保存在特定合约的数据存储器中，我们在区块链浏览器中查看该地址是看不到任何信息的
@@ -102,16 +91,11 @@ contract test1 {
     event FinanceAccpetEvent(uint256 id, address enterprise, address banker, uint amount);
     event TransactionSettleEvent(uint256 id, address payer, address[] payee);
 
-    // event CreateResult(int count);
-    // event InsertResult(int count);
-    // event UpdateResult(int count);
-    // event RemoveResult(int count);
 
     // 企业注册，新注册企业默认类型为普通企业
     function newEnterprise(string memory name, uint property) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
             enterprises[msg.sender].name = name;
-            // enterprises[msg.sender].password = password;
             enterprises[msg.sender].eType = EnterpriseType.normal;
             enterprises[msg.sender].property = property;
             enterprises[msg.sender].exists = true;
@@ -133,22 +117,6 @@ contract test1 {
         }
     }
 
-    // 不申请了，银行直接自行认证
-    // function coreEnterpriseRequest(address bankAddr) public returns (bool, string memory){
-    //     // 把申请记录插入保存至数据库
-    //     TableFactory tf = TableFactory(0x1001);
-    //     Table table = tf.openTable("CoreRequst");
-
-    //     Entry entry = table.newEntry();
-    //     entry.set("bankAddr", bankAddr);
-    //     entry.set("enterpriseAddr", msg.sender);
-    //     entry.set("isAccept", int(0));
-
-    //     int count = table.insert(bankAddr, entry);
-    //     emit InsertResult(count);
-
-    //     return (true, "[INFO] Request send.");
-    // }
 
     // 核心企业认定功能
     function coreEnterpriseIdentifiy(address enterpriseAddr) public returns (bool, string memory){
@@ -158,21 +126,6 @@ contract test1 {
             return (false, "[ERROR] Enterprise doesn't exist.");
         }else{
             enterprises[enterpriseAddr].eType = EnterpriseType.core;
-
-            // // 更新数据库
-            // TableFactory tf = TableFactory(0x1001);
-            // Table table = tf.openTable("CoreRequst");
-
-            // Entry entry = table.newEntry();
-            // entry.set("isAccept", int(1));
-
-            // Condition condition = table.newCondition();
-            // condition.EQ("bankAddr", msg.sender);
-            // condition.EQ("enterpriseAddr", enterpriseAddr);
-
-            // int count = table.update(msg.sender, entry, condition);
-            // emit UpdateResult(count);
-
             return (true, "[INFO] That enterprise is core enterprise now.");
         }
     }
@@ -186,8 +139,7 @@ contract test1 {
             // 创建单据，生成一个单据Id
             uint256 receiptId = uint256(keccak256(abi.encodePacked(seller, amount, now)));
             if(!receipts[receiptId].exists){
-                Transaction memory tran = Transaction(transactionId, seller, msg.sender, info, time, receiptId, false, true);
-                transactions[transactionId] = tran;
+                transactions[transactionId] = Transaction(transactionId, seller, msg.sender, info, time, receiptId, false, true);
                 enterprises[msg.sender].transactions.push(transactionId);
                 enterprises[seller].transactions.push(transactionId);
                 // 交易创建事件触发
@@ -245,7 +197,6 @@ contract test1 {
         }
     }
 
-    // 不设置申请了，银行直接进行确认
     // 第三方机构对于单据进行确认，以提高可信度。creditLevel, 银行确认+2, 物流公司+1。
     function confirmReceipt(uint256 receiptId) public{
         require(
@@ -284,13 +235,8 @@ contract test1 {
             uint256 financingId = uint256(keccak256(abi.encodePacked(msg.sender, amount, now)));
             if(!financings[financingId].exists){
                 // 融资
-                financings[financingId].id = financingId;
-                financings[financingId].enterprise = msg.sender;
-                financings[financingId].bank = bankAddr;
-                financings[financingId].receiptId = receiptId;
-                financings[financingId].date = date;
-                financings[financingId].amount = amount;
-                financings[financingId].exists = true;
+                Financing memory finance = Financing(financingId, msg.sender, bankAddr, receiptId, date, amount, true);
+                financings[financingId] = finance;
 
                 enterprises[msg.sender].financings.push(financingId);
                 emit FinanceAccpetEvent(financingId, msg.sender, bankAddr, amount);
@@ -312,8 +258,7 @@ contract test1 {
         }else{
             uint totalAmount = 0;
             // 扣款
-            uint i = 0;
-            for(i = 0; i < receipts[receiptId].payees.length; i++){
+            for(uint i = 0; i < receipts[receiptId].payees.length; i++){
                 address payeeAddr = receipts[receiptId].payees[i];
                 uint amount = receipts[receiptId].payInfo[payeeAddr];
                 enterprises[payeeAddr].property += amount;
@@ -341,7 +286,6 @@ contract test1 {
             }else{
                 return (true, 2, enterprises[msg.sender].name);
             }
-                
         }else if(thirdParties[msg.sender].exists){
             if(thirdParties[msg.sender].tType == ThirdPartyType.bank){
                 return (true, 3, thirdParties[msg.sender].name);
@@ -353,30 +297,10 @@ contract test1 {
         }
     }
 
-    // function validaterUser(string memory password) public returns (bool, string memory) {
-    //     if(enterprises[msg.sender].exists){
-    //         if(enterprises[msg.sender].password == password){
-    //             return (true, enterprises[msg.sender].name);
-    //         }
-    //         else{
-    //             return (true, "[ERROR] invalid password");
-    //         }
-    //     }else if(thirdParties[msg.sender].exists){
-    //         if(thirdParties[msg.sender].password == password){
-    //             return (true, thirdParties[msg.sender].name);
-    //         }
-    //         else{
-    //             return (true, "[ERROR] invalid password");
-    //         }
-    //     }else{
-    //         return (false, "[ERROR] Please register first!");
-    //     }
-    // }
 
-    function findAllEnterpriseAddr() public view returns(bool, uint num, address[] memory, string memory, uint[] memory){
+    function findAllEnterpriseAddr() public view returns(bool, uint num, address[] memory, string memory){
         address[] memory addrs = new address[](users.length);
         string memory names = "";
-        uint[] memory enterpriseType = new uint[](users.length);
         uint count = 0;
         for(uint i = 0; i < users.length; i++){
             address addr = users[i];
@@ -389,20 +313,14 @@ contract test1 {
                     names = strConcat(names, enterprises[addr].name);
                     names = strConcat(names, ",");
                 }
-
-                if(enterprises[addr].eType == EnterpriseType.core){
-                    enterpriseType[count] = 1;
-                }else{
-                    enterpriseType[count] = 0;
-                }
                 count++;
             }
         }
         if(count == 0){
-            return (false, 0, addrs, names, enterpriseType);
+            return (false, 0, addrs, names);
         }
         else{
-            return (true, count, addrs, names, enterpriseType);
+            return (true, count, addrs, names);
         }
     }
 
@@ -449,7 +367,7 @@ contract test1 {
         receiptId = new uint256[](enterprises[msg.sender].transactions.length);
         settled = new bool[](enterprises[msg.sender].transactions.length);
 
-        uint256[] memory tranIds = enterprises[msg.sender].transactions;
+        uint256[] tranIds = enterprises[msg.sender].transactions;
         for(uint i = 0; i < tranIds.length; i++){
             seller[i] = transactions[tranIds[i]].seller;
             buyer[i] = transactions[tranIds[i]].buyer;
@@ -499,8 +417,8 @@ contract test1 {
         uint256[] memory id,
         address[] memory bank,
         uint256[] memory receiptId,
-        uint[] memory date,
-        uint[] memory amount
+        uint[] date,
+        uint[] amount
     ){
         id = new uint256[](enterprises[msg.sender].financings.length);
         bank = new address[](enterprises[msg.sender].financings.length);
@@ -508,7 +426,7 @@ contract test1 {
         date = new uint[](enterprises[msg.sender].financings.length);
         amount = new uint[](enterprises[msg.sender].financings.length);
 
-        uint256[] memory finaIds = enterprises[msg.sender].financings;
+        uint256[] finaIds = enterprises[msg.sender].financings;
         for(uint i = 0; i < finaIds.length; i++){
             id[i] = financings[finaIds[i]].id;
             bank[i] = financings[finaIds[i]].bank;
@@ -522,14 +440,13 @@ contract test1 {
     /*------------------------------------------ 工具函数 --------------------------------------------*/
 
     // 拼接字符串
-    function strConcat(string memory _a, string memory _b) internal returns (string memory){
+    function strConcat(string _a, string _b) internal returns (string){
         bytes memory _ba = bytes(_a);
         bytes memory _bb = bytes(_b);
         string memory ret = new string(_ba.length + _bb.length);
         bytes memory bret = bytes(ret);
         uint k = 0;
-        uint i = 0;
-        for (i = 0; i < _ba.length; i++)bret[k++] = _ba[i];
+        for (uint i = 0; i < _ba.length; i++)bret[k++] = _ba[i];
         for (i = 0; i < _bb.length; i++) bret[k++] = _bb[i];
         return string(ret);
    }  

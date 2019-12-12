@@ -8,6 +8,8 @@
 </template>
 
 <script>
+    import { getUserInfo } from '../../api/user.js'
+    import axios from '@/libs/api.request'
     export default {
         name: "index",
         components:{
@@ -17,14 +19,17 @@
 
         },
         created() {
-            // this.getUserInfo().then(res => {
-            //     this.$router.push({
-            //         name: this.$config.homeName
-            //     })
-            // })
+          this.getData();
         },
         methods:{
-
+          getData(){
+              axios.request({
+                url: 'api/enterprise/list',
+                method: 'get'
+              }).then({
+                
+              })
+          }
         }
     }
 </script>

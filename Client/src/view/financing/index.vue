@@ -72,6 +72,7 @@
 </template>
 
 <script>
+    import {getUserInfo} from '../../api/user.js'
 
     export default {
         name: 'transaction',
@@ -152,10 +153,20 @@
         },
 
         created() {
+          this.getUserData();
             // this.findSuggestionData()
         },
 
         methods: {
+          async getUserData(params){
+            console.log(fuck)
+            let res = await getUserInfo(params);
+            if (res.code === 200) {
+                  
+            } else {
+              this.$Message.error(res.message)
+            }
+          },
 
             openAddModal() {
                 this.isAdd = true

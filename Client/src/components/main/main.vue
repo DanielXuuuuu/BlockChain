@@ -70,9 +70,6 @@ export default {
     tagRouter () {
       return this.$store.state.app.tagRouter
     },
-    userAvatar () {
-      return this.$store.state.user.avatarImgPath
-    },
     cacheList () {
       const list = ['ParentView', ...this.tagNavList.length ? this.tagNavList.filter(item => !(item.meta && item.meta.notCache)).map(item => item.name) : []]
       return list
@@ -85,9 +82,6 @@ export default {
     },
     hasReadErrorPage () {
       return this.$store.state.app.hasReadErrorPage
-    },
-    unreadCount () {
-      return this.$store.state.user.unreadCount
     }
   },
   methods: {
@@ -100,8 +94,7 @@ export default {
       'closeTag'
     ]),
     ...mapActions([
-      'handleLogin',
-      'getUnreadMessageCount'
+      'handleLogin'
     ]),
     turnToPage (route) {
       let { name, params, query } = {}
@@ -171,8 +164,6 @@ export default {
         name: this.$config.homeName
       })
     }
-    // 获取未读消息条数
-    this.getUnreadMessageCount()
   }
 }
 </script>
