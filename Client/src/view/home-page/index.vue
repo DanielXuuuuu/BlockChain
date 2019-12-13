@@ -24,8 +24,7 @@
 
     <!--reigister enterprise emodal-->
     <Modal v-model="isEnterprise" @on-cancel="cancelModal" title="注册成为公司" width="800">
-      <Form :model="registerForm" ref="registerForm" :rules="rules"
-            :label-width="110">
+      <Form :model="registerForm" ref="registerForm1" :label-width="110">
         <Card>
           <Row>
             <Col span="11">
@@ -50,8 +49,7 @@
 
     <!--reigister thirdParty emodal-->
     <Modal v-model="isThirdParty" @on-cancel="cancelModal" title="注册成为第三方机构" width="800">
-      <Form :model="registerForm" ref="registerForm" :rules="rules"
-            :label-width="110">
+      <Form :model="registerForm" ref="registerForm2" :label-width="110">
         <Card>
           <Row>
             <Col span="11">
@@ -60,10 +58,10 @@
               </FormItem>
             </Col>
             <Col span="11">
-              <FormItem label="机构类型：" prop="tType">
-                <Select v-model="registerForm.tType">
-                  <Option value="0" key="0">物流公司</Option>
-                  <Option value="1" key="1">银行</Option>
+              <FormItem label="机构类型：" prop="type">
+                <Select v-model="registerForm.type">
+                  <Option value=0 key=0>物流公司</Option>
+                  <Option value=1 key=1>银行</Option>
                 </Select>
               </FormItem>
             </Col>
@@ -81,57 +79,61 @@
 </template>
 
 <script>
-  import { getUserDetail } from '../../api/user.js'
-  export default {
-    name: 'index',
-    components: {},
-    data () {
-      return {
-        isEnterprise: false,
-        isThirdParty: false,
+    import {getUserDetail, registerThirdParty, registerEnterprise} from '../../api/user.js'
 
-        registerForm:{},
-        userData: {},
-        unRegister: true
-      }
-    },
-    created () {
-      this.getUserData()
-    },
-    methods: {
-      async getUserData () {
-        let res = await getUserDetail()
-       this. userData = res.data.data.output;
-       if(this.userData['0']){
-         this.unRegister = false
-       }
-      },
+    export default {
+        name: 'index',
+        components: {},
+        data() {
+            return {
+                isEnterprise: false,
+                isThirdParty: false,
 
-      openEnterpriseModal(){
-        this.isEnterprise = true
-      },
+                registerForm: {},
+                userData: {},
+                unRegister: true
+            }
+        },
+        created() {
+            this.getUserData()
+        },
+        methods: {
+            async getUserData() {
+                let res = await getUserDetail()
+                this.userData = res.data.data.output
+                if (this.userData['0']) {
+                    this.unRegister = false
+                }
+            },
+            async doEnterpriseRegister() {
+                let res = await registerEnterprise(this.registerForm)
+                this.getUserData()
+            },
 
-      openThirdPartyModal(){
-        this.isThirdParty = true
-      },
+            async doThridPartyRegister() {
+                let res = await registerThirdParty(this.registerForm)
+                this.getUserData()
+            },
+            openEnterpriseModal() {
+                this.isEnterprise = true
+            },
 
-      cancelModal(){
-        this.isEnterprise = false
-        this.isThirdParty = false
-      },
+            openThirdPartyModal() {
+                this.isThirdParty = true
+            },
 
-      doThridPartyRegister(){
-
-      },
-      doEnterpriseRegister(){
-
-      }
+            cancelModal() {
+                this.isEnterprise = false
+                this.isThirdParty = false
+                this.$refs.registerForm1.resetFields()
+                this.$refs.registerForm2.resetFields()
+            },
+        }
     }
-  }
 </script>
 
 <style scoped>
-  h1, h2,  p {
+  h1, h2, p {
     text-align: center;
     color: black;
   }

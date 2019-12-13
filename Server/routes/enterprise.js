@@ -14,7 +14,7 @@ var router = express.Router();
 router.get("/list", function(req, res, next){
     let contractName = "hello";
     let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
-    let functionName = "findAllEnterpriseAddr";
+    let functionName = "findAllEnterprise";
     let parameters =  [];
 
     let abi = getAbi(contractName);
@@ -41,7 +41,8 @@ router.get("/list", function(req, res, next){
                     for(let i = 0; i < num; i++){
                         let temp = {
                             address:  ret.output['2'][i],
-                            name:  ret.output['3'][i]
+                            isCore: ret.output['4'][i],
+                            name:  ret.output['3'][i],
                         }
                         returnData.push(temp)
                     }

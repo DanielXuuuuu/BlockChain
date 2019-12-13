@@ -29,6 +29,7 @@ contract hello {
         uint256 id;                 // 交易hash
         address seller;             // 卖方
         address buyer;              // 买方
+        uint amount;                // 金额
         string info;                // 交易相关信息
         uint transactionTime;       // 交易时间
         uint256 receiptId;          // 交易对应的应收账款单据Id
@@ -139,7 +140,7 @@ contract hello {
             // 创建单据，生成一个单据Id
             uint256 receiptId = uint256(keccak256(abi.encodePacked(seller, amount, now)));
             if(!receipts[receiptId].exists){
-                transactions[transactionId] = Transaction(transactionId, seller, msg.sender, info, time, receiptId, false, true);
+                transactions[transactionId] = Transaction(transactionId, seller, msg.sender, amount, info, time, receiptId, false, true);
                 enterprises[msg.sender].transactions.push(transactionId);
                 enterprises[seller].transactions.push(transactionId);
                 // 交易创建事件触发
@@ -181,7 +182,7 @@ contract hello {
         }else{
             // 创建交易
             uint256 transactionId = uint256(keccak256(abi.encodePacked(msg.sender, seller, amount, now)));
-            Transaction memory tran = Transaction(transactionId, seller, msg.sender, info, time, receiptId, false, true);
+            Transaction memory tran = Transaction(transactionId, seller, msg.sender, amount, info, time, receiptId, false, true);
             transactions[transactionId] = tran;
             enterprises[msg.sender].transactions.push(transactionId);
             enterprises[seller].transactions.push(transactionId);
@@ -298,14 +299,20 @@ contract hello {
     }
 
 
-    function findAllEnterprise() public view returns(bool, uint num, address[] memory, string memory){
+    function findAllEnterprise() public view returns(bool, uint num, address[] memory, string memory, uint memory tType){
         address[] memory addrs = new address[](users.length);
+        uint[] memory tType = new uint[](users.length);
         string memory names = "";
         uint count = 0;
         for(uint i = 0; i < users.length; i++){
             address addr = users[i];
             if(enterprises[addr].exists){
                 addrs[count] = addr;
+                if(enterprises[addr].tType == EnterpriseType.core){
+                    tType[count] = 1;
+                }else{
+                    tType[count] = 0;
+                }
                 // 字符串拼接
                 if(count == 0){
                     names = enterprises[addr].name;
@@ -355,6 +362,7 @@ contract hello {
     function getEnterpriseAllTransaction() public view returns(
         address[] memory seller,
         address[] memory buyer,
+        uint[] memory amount,
         string memory info,
         uint[] memory transactionTime,
         bool[] memory settled,
@@ -362,6 +370,7 @@ contract hello {
     ){
         seller = new address[](enterprises[msg.sender].transactions.length);
         buyer = new address[](enterprises[msg.sender].transactions.length);
+        amount = new uint[](enterprises[msg.sender].transactions.length);
         info = "";
         transactionTime = new uint[](enterprises[msg.sender].transactions.length);
         receiptId = new uint256[](enterprises[msg.sender].transactions.length);
@@ -371,7 +380,7 @@ contract hello {
         for(uint i = 0; i < tranIds.length; i++){
             seller[i] = transactions[tranIds[i]].seller;
             buyer[i] = transactions[tranIds[i]].buyer;
-
+            amount[i] = transactions[tranIds[i]].amount;
             // 字符串拼接
             if(i == 0){
                 info = transactions[tranIds[i]].info;

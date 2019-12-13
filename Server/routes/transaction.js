@@ -41,14 +41,16 @@ router.get("/list", function(req, res, next){
                     let returnData = []
                     for(let i = 0; i < num; i++){
                         ret.output['receiptId'][i] = ret.output['receiptId'][i].toString(10);
+                        ret.output['amount'][i] = ret.output['amount'][i].toString(10);
                         ret.output['transactionTime'][i] = ret.output['transactionTime'][i].toString(10);
                         let temp = {
-                            seller:  ret.output['seller'][i],
-                            buyer:  ret.output['buyer'][i],
-                            info:  ret.output['info'][i],
-                            transactionTime:  ret.output['transactionTime'][i],
-                            settled:  ret.output['settled'][i],
-                            receiptId:  ret.output['receiptId'][i],
+                            seller: ret.output['seller'][i],
+                            buyer: ret.output['buyer'][i],
+                            amount: ret.output['amount'][i],
+                            info: ret.output['info'][i],
+                            transactionTime: ret.output['transactionTime'][i],
+                            settled: ret.output['settled'][i],
+                            receiptId: ret.output['receiptId'][i],
                         }
                         returnData.push(temp)
                     }

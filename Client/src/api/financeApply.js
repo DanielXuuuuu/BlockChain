@@ -7,10 +7,16 @@ export const getAllfinanceApply = () => {
   })
 }
 
-export const addApply = (formData) => {
+export const addApply = ({receiptId, bankAddr, amount, date}) => {
+  const data = {
+    receiptId,
+    bankAddr,
+    amount,
+    date
+  }
   return axios.request({
     url: 'api/financeApply/add',
-    formData,
+    data,
     method: 'post'
   })
 }

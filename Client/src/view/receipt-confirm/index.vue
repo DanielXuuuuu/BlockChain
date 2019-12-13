@@ -1,8 +1,7 @@
 <template>
-  <div>
-    <!--按钮部分-->
-    <Card>
-      <p slot="title">认证历史</p>
+  <div style="height: 100%;">
+    <Card style="height: 100%;">
+      <p slot="title">认证单据</p>
       <Row>
         <Col span="5">
           <Button type="primary" style="width: 100px;" @click="openAddModal">
@@ -11,21 +10,11 @@
         </Col>
       </Row>
       <br>
-      <!--表格部分-->
-      <div>
-        <Table :columns="columnsList" :data="receiptData" border @on-selection-change="batchSelect"
-               disabled-hover></Table>
-      </div>
-      <div style="margin: 10px;overflow: hidden">
-        <div style="float: right;">
-          <Page show-total show-elevator :total="page.total" :current="page.currentPage"></Page>
-        </div>
-      </div>
     </Card>
 
     <!--Addmodal-->
-    <Modal v-model="isAdd" @on-cancel="cancelModal" title="核心企业认证" width="800">
-      <Form :model="addForm" ref="addForm" :rules="rules" :label-width="110">
+    <Modal v-model="isAdd" @on-cancel="cancelModal" title="单据认证" width="800">
+      <Form :model="addForm" ref="addForm" :label-width="110">
         <Card>
           <Row>
             <FormItem label="应收账款单据ID：" prop="receiptId">
@@ -44,77 +33,40 @@
 </template>
 
 <script>
+    import {receiptConfirm} from '../../api/receipt.js'
 
-  export default {
-    name: 'transaction',
-    components: {},
-    data: function () {
-      return {
-        // modal控制
-        isAdd: false,
-
-        rules: {// 用户表单校验对象
+    export default {
+        name: 'transaction',
+        components: {},
+        data: function () {
+            return {
+                // modal控制
+                isAdd: false,
+                addForm: {},
+            }
         },
 
-        // 表头数据
-        columnsList: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '企业名称',
-            align: 'center',
-            key: 'name'
-          },
-          {
-            title: '账户地址',
-            align: 'center',
-            key: 'address'
-          }
-        ],
-        gettingEnterpriseData: false,
-
-        receiptData: [],
-        addForm: {},
-
-        loading: false, // 远程查询时使用
-        loading1: false, // 远程查询时使用
-        loading2: false, // 远程查询时使用
-
-        delId: {
-          ids: ''
+        created() {
         },
-        page: {
-          total: 1,
-          currentPage: 1
+
+        methods: {
+            openAddModal() {
+                this.isAdd = true
+            },
+
+            async doConfirm() {
+                let res = await receiptConfirm(this.addForm)
+                if (res.code == 200) {
+                    this.$Message.success("认证交易成功，单据可信度提升！")
+                }
+            },
+
+            cancelModal() {
+                this.isAdd = false
+                this.$refs.addForm.resetFields()
+            }
         }
-      }
-    },
-
-    created () {
-      // this.findCoreEnterpriseData()
-    },
-
-    methods: {
-      // findCoreEnterpriseData(){
-      //
-      // },
-
-      openAddModal () {
-        this.isAdd = true
-      },
-
-      doConfirm () {
-
-      },
-
-      cancelModal () {
-        this.isAdd = false
-      }
     }
-  }
 
 </script>
 

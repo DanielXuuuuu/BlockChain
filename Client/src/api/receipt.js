@@ -1,6 +1,6 @@
 import axios from '@/libs/api.request'
 
-export const getReceiptDetail = ({receiptId} ) => {
+export const getReceiptDetail = ({receiptId}) => {
   const data = {
     receiptId,
   }
@@ -11,7 +11,10 @@ export const getReceiptDetail = ({receiptId} ) => {
   })
 }
 
-export const receiptConfirm = (data ) => {
+export const receiptConfirm = ({receiptId}) => {
+  const data = {
+    receiptId,
+  }
   return axios.request({
     url: 'api/financeApply/confirm',
     data ,
@@ -19,7 +22,10 @@ export const receiptConfirm = (data ) => {
   })
 }
 
-export const receiptSettle = (data ) => {
+export const receiptSettle = ({receiptId}) => {
+  const data = {
+    receiptId,
+  }
   return axios.request({
     url: 'api/financeApply/settle',
     data ,

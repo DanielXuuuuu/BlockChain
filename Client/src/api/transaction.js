@@ -7,18 +7,32 @@ export const getTransactionData = () => {
   })
 }
 
-export const TransactionWithNewReceipt = (formData) => {
+export const TransactionWithNewReceipt = ({seller, amount, time, deadline, info}) => {
+  const data = {
+    seller,
+    amount,
+    time,
+    deadline,
+    info
+  }
   return axios.request({
     url: 'api/transaction/createNewReceipt',
-    formData,
+    data,
     method: 'post'
   })
 }
 
-export const TransactionByTransferReceipt = (formData) => {
+export const TransactionByTransferReceipt = ({seller, amount, time, receiptId, info}) => {
+  const data = {
+    seller,
+    amount,
+    time,
+    receiptId,
+    info
+  }
   return axios.request({
     url: 'api/transaction/transferReceipt',
-    formData,
+    data,
     method: 'post'
   })
 }

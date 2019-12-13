@@ -7,10 +7,13 @@ export const getAllEnterprises = () => {
   })
 }
 
-export const coreEnterpriseIdentifiy = (formData) => {
+export const coreEnterpriseIdentifiy = ({address}) => {
+  const data = {
+    address,
+  }
   return axios.request({
     url: 'api/enterprise/coreEnterpriseIdentifiy',
-    formData,
+    data,
     method: 'post'
   })
 }

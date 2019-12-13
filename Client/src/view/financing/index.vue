@@ -33,7 +33,7 @@
               </FormItem>
             </Col>
             <Col span="11">
-              <FormItem label="申请银行：" prop="seller">
+              <FormItem label="申请银行：" prop="bankAddr">
                 <!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
                 <!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
                 <!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
@@ -52,8 +52,9 @@
             </Col>
             <Col span="11">
               <FormItem label="申请时间：" prop="date">
-                <DatePicker type="datetime" ref="timeAdd" placeholder="请选择申请时间"
-                            style="width: 227px"></DatePicker>
+                <Input placeholder="请输入申请时间" clearable v-model="applyForm.date"></Input>
+                <!--                <DatePicker type="datetime" ref="timeAdd" placeholder="请选择申请时间"-->
+                <!--                            style="width: 227px"></DatePicker>-->
               </FormItem>
             </Col>
           </Row>
@@ -66,7 +67,7 @@
       </div>
     </Modal>
 
-        <!--ReceiptDetailmodal-->
+    <!--ReceiptDetailmodal-->
     <Modal v-model="isReceipt" @on-cancel="cancelModal" title="应收账款单据详情" width="800">
       <Form :model="receiptData" ref="receiptData" :label-width="110">
         <FormItem label="单据ID：" prop="id">
@@ -105,122 +106,124 @@
 </template>
 
 <script>
-  import {getAllfinanceApply} from '../../api/financeApply.js'
-  import { getReceiptDetail } from '../../api/receipt.js'
-  export default {
-    name: 'financing',
-    components: {},
-    data: function () {
-      return {
-        // modal控制
-        isAdd: false,
-        isReceipt: false,
-        // 表头数据
-        columnsList: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '银行账户地址',
-            align: 'center',
-            key: 'bank'
-          },
-          {
-            title: '融资时间',
-            align: 'center',
-            key: 'date'
-          },
-          {
-            title: '融资金额',
-            align: 'center',
-            key: 'amount'
-          },
-          {
-            title: '使用的应收账款单据',
-            align: 'center',
-            key: 'handle',
-            width: 200,
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary'
-                  },
-                  style: {
-                    marginRight: '5px',
-                    display: 'inline-block'
-                  },
-                  on: {
-                    click: () => {
-                      let id = params.row.receiptId
-                      console.log(id)
-                      this.findReceiptDetail(id)
+    import {getAllfinanceApply} from '../../api/financeApply.js'
+    import {getReceiptDetail} from '../../api/receipt.js'
+
+    export default {
+        name: 'financing',
+        components: {},
+        data: function () {
+            return {
+                // modal控制
+                isAdd: false,
+                isReceipt: false,
+                // 表头数据
+                columnsList: [
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+                    {
+                        title: '银行账户地址',
+                        align: 'center',
+                        key: 'bank'
+                    },
+                    {
+                        title: '融资时间',
+                        align: 'center',
+                        key: 'date'
+                    },
+                    {
+                        title: '融资金额',
+                        align: 'center',
+                        key: 'amount'
+                    },
+                    {
+                        title: '使用的应收账款单据',
+                        align: 'center',
+                        key: 'handle',
+                        width: 200,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary'
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                        display: 'inline-block'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            let id = params.row.receiptId
+                                            console.log(id)
+                                            this.findReceiptDetail(id)
+                                        }
+                                    }
+                                }, '查看'),
+                            ])
+                        }
                     }
-                  }
-                }, '查看'),
-              ])
+                ],
+                gettingEnterpriseData: false,
+
+                financingData: [],
+                receiptData: {},
+                applyForm: {},
+
+                loading: false, // 远程查询时使用
+                loading1: false, // 远程查询时使用
+                loading2: false, // 远程查询时使用
+
+                delId: {
+                    ids: ''
+                },
+                page: {
+                    total: 1,
+                    currentPage: 1
+                }
             }
-          }
-        ],
-        gettingEnterpriseData: false,
-
-        financingData: [],
-        receiptData: {},
-        applyForm: {},
-        transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
-
-        loading: false, // 远程查询时使用
-        loading1: false, // 远程查询时使用
-        loading2: false, // 远程查询时使用
-
-        delId: {
-          ids: ''
         },
-        page: {
-          total: 1,
-          currentPage: 1
+        created() {
+            this.findFinanceData()
+        },
+
+        methods: {
+            async findFinanceData() {
+                let res = await getAllfinanceApply()
+                this.financingData = res.data.data
+                console.log(this.financingData)
+            },
+
+            async findReceiptDetail(id) {
+                let res = await getReceiptDetail({receiptId: id})
+                console.log(res)
+                this.receiptData = res.data.data
+                this.openReceiptModal()
+            },
+
+            async doFinancingApply() {
+                let res = await getReceiptDetail(this.applyForm)
+
+                this.findFinanceData()
+            },
+
+            openAddModal() {
+                this.isAdd = true
+            },
+
+            openReceiptModal() {
+                this.isReceipt = true
+            },
+
+            cancelModal() {
+                this.isAdd = false
+                this.isReceipt = false
+                this.$refs.applyForm.resetFields()
+            }
         }
-      }
-    },
-    created () {
-      this.findFinanceData()
-    },
-
-    methods: {
-      async findFinanceData () {
-        let res  = await getAllfinanceApply()
-        this.financingData = res.data.data
-        console.log(this.financingData)
-      },
-
-      async findReceiptDetail (id) {
-        let res = await getReceiptDetail({receiptId: id})
-        console.log(res)
-        this.receiptData = res.data.data
-        this.openReceiptModal()
-      },
-
-      openAddModal () {
-        this.isAdd = true
-      },
-
-      openReceiptModal () {
-        this.isReceipt = true
-      },
-
-      doFinancingApply () {
-
-      },
-
-      cancelModal () {
-        this.isAdd = false
-        this.isReceipt = false
-
-      }
     }
-  }
 
 </script>
 

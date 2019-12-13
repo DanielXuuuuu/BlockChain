@@ -14,7 +14,7 @@ var router = express.Router();
 router.get("/listBank", function(req, res, next){
     let contractName = "hello";
     let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
-    let functionName = "findAllBankAddr";
+    let functionName = "findAllBank";
     let parameters =  [];
 
     let abi = getAbi(contractName);

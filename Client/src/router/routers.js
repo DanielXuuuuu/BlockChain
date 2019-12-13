@@ -109,9 +109,9 @@ export default [
     children: [
       {
         path: 'confirm',
-        name: '核心企业名录',
+        name: '企业名录',
         meta: {
-          title: '核心企业名录',
+          title: '企业名录',
           notCache: true,
           icon: 'md-checkmark-circle-outline'
         },

@@ -20,14 +20,14 @@
       </div>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
-          <Page show-total show-elevator :total="page.total" :current="page.currentPage"></Page>
+          <Page show-total show-elevator :total="transactionData.length" :current="page.currentPage"></Page>
         </div>
       </div>
     </Card>
 
     <!--Addmodal-->
     <Modal v-model="isAdd" @on-cancel="cancelModal" title="发起新交易" width="800">
-      <Form :model="newTransactionForm" ref="newTransactionForm"  :label-width="110">
+      <Form :model="newTransactionForm" ref="newTransactionForm" :label-width="110">
         <Card>
           <Row>
             <Col span="11">
@@ -61,14 +61,14 @@
             <Row>
               <Col span="11">
                 <FormItem label="交易时间：" prop="time">
-                  <Input placeholder="请输入交易时间" clearable v-model="newTransactionForm.creatTime"></Input>
+                  <Input placeholder="请输入交易时间" clearable v-model="newTransactionForm.time"></Input>
                   <!-- <DatePicker type="datetime" ref="time" placeholder="请选择交易时间"
                               style="width: 227px"></DatePicker> -->
                 </FormItem>
               </Col>
               <Col span="11" v-if="transactionMethod==0">
                 <FormItem label="还款时间：" prop="deadline">
-                   <Input placeholder="请输入还款时间" clearable v-model="newTransactionForm.deadline"></Input>
+                  <Input placeholder="请输入还款时间" clearable v-model="newTransactionForm.deadline"></Input>
                   <!-- <DatePicker type="datetime" ref="deadline" placeholder="请选择还款时间"
                               style="width: 227px"></DatePicker> -->
                 </FormItem>
@@ -92,7 +92,7 @@
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelModal">取消</Button>
-        <Button type="primary" @click="doCreateNewTransaction">确认</Button>
+        <Button type="primary" @click="doCreateTransaction">确认</Button>
       </div>
     </Modal>
 
@@ -110,7 +110,7 @@
       <!--自定义页脚-->
       <div slot="footer">
         <Button type="text" @click="cancelModal">取消</Button>
-        <Button type="primary" @click="doSettleReceipt">确认</Button>
+        <Button type="primary" @click="doReceiptSettle">确认</Button>
       </div>
     </Modal>
 
@@ -153,164 +153,179 @@
 </template>
 
 <script>
-  import { getTransactionData, TransactionWithNewReceipt, TransactionByTransferReceipt } from '../../api/transaction.js'
-  import { receiptSettle, getReceiptDetail } from '../../api/receipt.js'
-  import { getAllEnterprises } from '../../api/enterprise.js'
+    import {getTransactionData, TransactionWithNewReceipt, TransactionByTransferReceipt} from '../../api/transaction.js'
+    import {receiptSettle, getReceiptDetail} from '../../api/receipt.js'
+    import {getAllEnterprises} from '../../api/enterprise.js'
 
-  export default {
-    name: 'transaction',
-    components: {},
-    data: function () {
-      return {
-        // modal控制
-        isAdd: false,
-        isReceipt: false,
-        isSettle: false,
+    export default {
+        name: 'transaction',
+        components: {},
+        data: function () {
+            return {
+                // modal控制
+                isAdd: false,
+                isReceipt: false,
+                isSettle: false,
 
-        // 表头数据
-        columnsList: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '卖方',
-            align: 'center',
-            key: 'seller'
-          },
-          {
-            title: '买方',
-            align: 'center',
-            key: 'buyer'
-          },
-          {
-            title: '交易详情',
-            align: 'center',
-            key: 'info'
-          },
-          {
-            title: '交易时间',
-            align: 'center',
-            key: 'transactionTime'
-          },
-          {
-            title: '是否结算',
-            align: 'center',
-            key: 'settled',
-            render: (h, params) =>{
-              let settled = "";
-              if(params.row.settled){
-                settled = "已结算"
-              }else{
-                settled = "尚未结算"
-              }
-              return h('span', {
-
-              }, settled)
-            }
-          },
-          {
-            title: '应收账款单据信息',
-            align: 'center',
-            key: 'handle',
-            width: 200,
-            render: (h, params) => {
-              return h('div', [
-                h('Button', {
-                  props: {
-                    type: 'primary'
-                  },
-                  style: {
-                    marginRight: '5px',
-                    display: 'inline-block'
-                  },
-                  on: {
-                    click: () => {
-                      let id = params.row.receiptId
-                      console.log(id)
-                      this.findReceiptDetail(id)
+                // 表头数据
+                columnsList: [
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+                    {
+                        title: '卖方',
+                        align: 'center',
+                        key: 'seller'
+                    },
+                    {
+                        title: '买方',
+                        align: 'center',
+                        key: 'buyer'
+                    },
+                    {
+                        title: '交易金额',
+                        align: 'center',
+                        key: 'amount'
+                    },
+                    {
+                        title: '交易详情',
+                        align: 'center',
+                        key: 'info'
+                    },
+                    {
+                        title: '交易时间',
+                        align: 'center',
+                        key: 'transactionTime'
+                    },
+                    {
+                        title: '是否结算',
+                        align: 'center',
+                        key: 'settled',
+                        render: (h, params) => {
+                            let settled = "";
+                            if (params.row.settled) {
+                                settled = "已结算"
+                            } else {
+                                settled = "尚未结算"
+                            }
+                            return h('span', {}, settled)
+                        }
+                    },
+                    {
+                        title: '应收账款单据信息',
+                        align: 'center',
+                        key: 'handle',
+                        width: 200,
+                        render: (h, params) => {
+                            return h('div', [
+                                h('Button', {
+                                    props: {
+                                        type: 'primary'
+                                    },
+                                    style: {
+                                        marginRight: '5px',
+                                        display: 'inline-block'
+                                    },
+                                    on: {
+                                        click: () => {
+                                            let id = params.row.receiptId
+                                            console.log(id)
+                                            this.findReceiptDetail(id)
+                                        }
+                                    }
+                                }, '查看'),
+                            ])
+                        }
                     }
-                  }
-                }, '查看'),
-              ])
+                ],
+                gettingEnterpriseData: false,
+
+                transactionData: [],
+                receiptData: {},
+                newTransactionForm: {},
+                settleForm: {},
+                transactionMethod: null, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
+
+                loading: false, // 远程查询时使用
+                loading1: false, // 远程查询时使用
+                loading2: false, // 远程查询时使用
+
+                delId: {
+                    ids: ''
+                },
+                page: {
+                    total: 1,
+                    currentPage: 1
+                }
             }
-          }
-        ],
-        gettingEnterpriseData: false,
-
-        transactionData: [],
-        receiptData: {},
-        newTransactionForm: {},
-        settleForm: {},
-        transactionMethod: null, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
-
-        loading: false, // 远程查询时使用
-        loading1: false, // 远程查询时使用
-        loading2: false, // 远程查询时使用
-
-        delId: {
-          ids: ''
         },
-        page: {
-          total: 1,
-          currentPage: 1
+
+        created() {
+            this.findTransactionData()
+        },
+
+        methods: {
+            async findTransactionData() {
+                let res = await getTransactionData()
+                this.transactionData = res.data.data
+                console.log(this.transactionData)
+            },
+
+            async findReceiptDetail(id) {
+                let res = await getReceiptDetail({receiptId: id})
+                console.log(res)
+                this.receiptData = res.data.data
+                this.openReceiptModal()
+            },
+
+            async doReceiptSettle() {
+                let res = await receiptSettle(this.settleForm)
+
+                this.findTransactionData()
+            },
+
+            doCreateTransaction() {
+                if (this.transactionMethod == 0) {
+                    this.doCreateNewTransaction()
+                } else {
+                    this.doTransferReceipt()
+                }
+            },
+
+            async doCreateNewTransaction() {
+                let res = await TransactionWithNewReceipt(this.newTransactionForm)
+                this.findTransactionData()
+            },
+
+            async doTransferReceipt() {
+                let res = await TransactionByTransferReceipt(this.newTransactionForm)
+                this.findTransactionData()
+            },
+
+            openAddModal() {
+                this.isAdd = true
+            },
+
+            openReceiptModal() {
+                this.isReceipt = true
+            },
+
+            openSettleModal() {
+                this.isSettle = true
+            },
+
+            cancelModal() {
+                this.isAdd = false
+                this.isReceipt = false
+                this.isSettle = false
+                this.transactionMethod = null
+                this.$refs.newTransactionForm.resetFields()
+                this.$refs.settleForm.resetFields()
+            }
         }
-      }
-    },
-
-    created () {
-      this.findTransactionData()
-    },
-
-    methods: {
-      async findTransactionData () {
-        let res  = await getTransactionData()
-        this.transactionData = res.data.data
-        console.log(this.transactionData)
-      },
-
-      async findReceiptDetail (id) {
-        let res = await getReceiptDetail({receiptId: id})
-        console.log(res)
-        this.receiptData = res.data.data
-        this.openReceiptModal()
-      },
-
-      doReceiptSettle() {
-        receiptSettle().then(res => {
-          console.log(res);
-        })
-      },
-
-      openAddModal () {
-        this.isAdd = true
-      },
-
-      openReceiptModal () {
-        this.isReceipt = true
-      },
-
-      openSettleModal () {
-        this.isSettle = true
-      },
-
-      doCreateNewTransaction () {
-
-      },
-
-      doSettleReceipt () {
-
-      },
-
-      cancelModal () {
-        this.isAdd = false
-        this.isReceipt = false
-        this.isSettle = false
-        this.transactionMethod = null
-      }
     }
-  }
 
 </script>
 

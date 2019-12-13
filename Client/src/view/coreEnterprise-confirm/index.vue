@@ -2,7 +2,7 @@
   <div>
     <!--按钮部分-->
     <Card>
-      <p slot="title">核心企业名录</p>
+      <p slot="title">企业名录</p>
       <Row>
         <Col span="5">
           <Button type="primary" style="width: 100px;" @click="openAddModal">
@@ -17,7 +17,7 @@
       </div>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
-          <Page show-total show-elevator :total="page.total" :current="page.currentPage"></Page>
+          <Page show-total show-elevator :total="coreEnterpriseData.length" :current="page.currentPage"></Page>
         </div>
       </div>
     </Card>
@@ -51,78 +51,93 @@
 </template>
 
 <script>
-  import {getAllEnterprises} from '../../api/enterprise.js'
-  export default {
-    name: 'transaction',
-    components: {},
-    data: function () {
-      return {
-        // modal控制
-        isAdd: false,
+    import {getAllEnterprises, coreEnterpriseIdentifiy} from '../../api/enterprise.js'
 
-        rules: {// 用户表单校验对象
+    export default {
+        name: 'transaction',
+        components: {},
+        data: function () {
+            return {
+                // modal控制
+                isAdd: false,
+
+                // 表头数据
+                columnsList: [
+                    {
+                        type: 'selection',
+                        width: 60,
+                        align: 'center'
+                    },
+                    {
+                        title: '企业名称',
+                        align: 'center',
+                        key: 'name'
+                    },
+                    {
+                        title: '账户地址',
+                        align: 'center',
+                        key: 'address'
+                    },
+                    {
+                        title: '企业类型',
+                        align: 'center',
+                        key: 'isCore',
+                        render: (h, params) => {
+                            let type = "";
+                            if (params.row.isCore) {
+                                type = "核心企业"
+                            } else {
+                                type = "普通企业"
+                            }
+                            return h('span', {}, type)
+                        }
+                    }
+                ],
+                gettingEnterpriseData: false,
+
+                coreEnterpriseData: [],
+                addForm: {},
+
+                loading: false, // 远程查询时使用
+                loading1: false, // 远程查询时使用
+                loading2: false, // 远程查询时使用
+
+                delId: {
+                    ids: ''
+                },
+                page: {
+                    total: 1,
+                    currentPage: 1
+                }
+            }
         },
 
-        // 表头数据
-        columnsList: [
-          {
-            type: 'selection',
-            width: 60,
-            align: 'center'
-          },
-          {
-            title: '企业名称',
-            align: 'center',
-            key: 'name'
-          },
-          {
-            title: '账户地址',
-            align: 'center',
-            key: 'address'
-          }
-        ],
-        gettingEnterpriseData: false,
-
-        coreEnterpriseData: [],
-        addForm: {},
-
-        loading: false, // 远程查询时使用
-        loading1: false, // 远程查询时使用
-        loading2: false, // 远程查询时使用
-
-        delId: {
-          ids: ''
+        created() {
+            this.findCoreEnterpriseData()
         },
-        page: {
-          total: 1,
-          currentPage: 1
+
+        methods: {
+            async findCoreEnterpriseData() {
+                let res = await getAllEnterprises();
+                this.coreEnterpriseData = res.data.data;
+                console.log(this.coreEnterpriseData)
+            },
+
+            async doConfirm() {
+                let res = await coreEnterpriseIdentifiy(this.addForm);
+                this.findCoreEnterpriseData()
+            },
+
+            openAddModal() {
+                this.isAdd = true
+            },
+
+            cancelModal() {
+                this.isAdd = false
+                this.$refs.addForm.resetFields()
+            }
         }
-      }
-    },
-
-    created () {
-      this.findCoreEnterpriseData()
-    },
-
-    methods: {
-      async findCoreEnterpriseData () {
-        let res  = await getAllEnterprises();
-        this.coreEnterpriseData = res.data.data;
-        console.log(this.coreEnterpriseData)
-      },
-      openAddModal () {
-        this.isAdd = true
-      },
-
-      doConfirm () {
-
-      },
-
-      cancelModal () {
-        this.isAdd = false
-      }
     }
-  }
 
 </script>
 
