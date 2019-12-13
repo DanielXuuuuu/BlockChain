@@ -1,23 +1,24 @@
 <template>
-  <div>
-    <Card>
+  <div style="height: 100%;">
+    <Card style="height: 100%;">
       <h1 slot="title">供应链金融</h1>
-      <p>这是一个供应链金融供应链解决方法</p>
+      <h2 style="margin-bottom: 100px;">这是一个供应链金融供应链解决方法</h2>
       <div v-if="unRegister">
         <p>您的公司/机构尚未登记</p>
-        <Row>
-          <Col span="10">
+        <br>
+        <Row style="text-align: center;">
+          <Col>
             <Button type="primary" style="width: 150px;" @click="openEnterpriseModal">
               注册成为公司
             </Button>
             <Button type="primary" style="width: 150px; margin-left: 20px;" @click="openThirdPartyModal">
-              注册称为第三方机构
+              注册成为第三方机构
             </Button>
           </Col>
         </Row>
       </div>
       <div v-else>
-        <p>欢迎，{{ userData.name }}</p>
+        <h1>欢迎使用，{{ userData.name }}！</h1>
       </div>
     </Card>
 
@@ -81,8 +82,6 @@
 
 <script>
   import { getUserDetail } from '../../api/user.js'
-  import axios from '@/libs/api.request'
-
   export default {
     name: 'index',
     components: {},
@@ -93,26 +92,20 @@
 
         registerForm:{},
         userData: {},
-        unRegister: false
+        unRegister: true
       }
     },
     created () {
-      this.getData()
+      this.getUserData()
     },
     methods: {
-      getData () {
-        axios.request({
-          url: 'api/enterprise/list',
-          method: 'get'
-        }).then(res => {
-          if (res.output.type === 0) {
-            this.unRegister = true
-          } else {
-            // set
-          }
-        })
+      async getUserData () {
+        let res = await getUserDetail()
+       this. userData = res.data.data.output;
+       if(this.userData['0']){
+         this.unRegister = false
+       }
       },
-
 
       openEnterpriseModal(){
         this.isEnterprise = true
@@ -138,7 +131,7 @@
 </script>
 
 <style scoped>
-  h1, p {
+  h1, h2,  p {
     text-align: center;
     color: black;
   }

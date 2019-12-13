@@ -35,10 +35,20 @@ router.get("/list", function(req, res, next){
                         ret.output = utils.decodeMethod(item, output);
                     }
                     ret.output['3'] = ret.output['3'].split(",");
+
+                    let num = parseInt(ret.output['1']);
+                    let returnData = [];
+                    for(let i = 0; i < num; i++){
+                        let temp = {
+                            address:  ret.output['2'][i],
+                            name:  ret.output['3'][i]
+                        }
+                        returnData.push(temp)
+                    }
                     res.status(200)
                     res.json({
                         message: "success",
-                        data: ret
+                        data: returnData
                     })
                 });
             } else {

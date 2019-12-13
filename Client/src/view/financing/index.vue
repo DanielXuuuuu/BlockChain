@@ -13,20 +13,18 @@
       <br>
       <!--表格部分-->
       <div>
-        <Table :columns="columnsList" :data="transactionData" border @on-selection-change="batchSelect"
-               disabled-hover></Table>
+        <Table :columns="columnsList" :data="financingData" border disabled-hover></Table>
       </div>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
-          <Page show-total show-elevator :total="page.total" :current="page.currentPage"></Page>
+          <Page show-total show-elevator :total="financingData.length" :current="page.currentPage"></Page>
         </div>
       </div>
     </Card>
 
     <!--Addmodal-->
     <Modal v-model="isAdd" @on-cancel="cancelModal" title="申请融资" width="800">
-      <Form :model="applyForm" ref="applyForm" :rules="rules"
-            :label-width="110">
+      <Form :model="applyForm" ref="applyForm" :label-width="110">
         <Card>
           <Row>
             <Col span="11">
@@ -68,12 +66,49 @@
       </div>
     </Modal>
 
+        <!--ReceiptDetailmodal-->
+    <Modal v-model="isReceipt" @on-cancel="cancelModal" title="应收账款单据详情" width="800">
+      <Form :model="receiptData" ref="receiptData" :label-width="110">
+        <FormItem label="单据ID：" prop="id">
+          <p>{{receiptData.id}}</p>
+        </FormItem>
+        <FormItem label="创建时间：" prop="createTime">
+          <p>{{receiptData.createTime}}</p>
+        </FormItem>
+        <FormItem label="结算日期：" prop="deadline">
+          <p>{{receiptData.deadline}}</p>
+        </FormItem>
+        <FormItem label="总金额：" prop="totalAmount">
+          <p>{{receiptData.totalAmount}}</p>
+        </FormItem>
+        <FormItem label="付款方：" prop="payer">
+          <p>{{receiptData.payer}}</p>
+        </FormItem>
+        <FormItem label="收款方：">
+          <p v-for="(item, index) in receiptData.payees" :key="index">{{item}} : {{ receiptData.amount[index] }} </p>
+        </FormItem>
+        <FormItem label="当前可信度：" prop="creditLevel">
+          <p>{{receiptData.creditLevel}}</p>
+        </FormItem>
+        <FormItem label="状态：" prop="settled">
+          <p v-if="receiptData.settled">已结算</p>
+          <p v-else>尚未结算</p>
+        </FormItem>
+      </Form>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="primary" @click="cancelModal">关闭</Button>
+      </div>
+    </Modal>
+
   </div>
 </template>
 
 <script>
+  import {getAllfinanceApply} from '../../api/financeApply.js'
+  import { getReceiptDetail } from '../../api/receipt.js'
   export default {
-    name: 'transaction',
+    name: 'financing',
     components: {},
     data: function () {
       return {
@@ -119,8 +154,9 @@
                   },
                   on: {
                     click: () => {
-                      let data = Object.assign({}, params.row)
-                      this.openReceiptModal(data)
+                      let id = params.row.receiptId
+                      console.log(id)
+                      this.findReceiptDetail(id)
                     }
                   }
                 }, '查看'),
@@ -131,6 +167,7 @@
         gettingEnterpriseData: false,
 
         financingData: [],
+        receiptData: {},
         applyForm: {},
         transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
 
@@ -147,12 +184,24 @@
         }
       }
     },
-
     created () {
-      // this.findSuggestionData()
+      this.findFinanceData()
     },
 
     methods: {
+      async findFinanceData () {
+        let res  = await getAllfinanceApply()
+        this.financingData = res.data.data
+        console.log(this.financingData)
+      },
+
+      async findReceiptDetail (id) {
+        let res = await getReceiptDetail({receiptId: id})
+        console.log(res)
+        this.receiptData = res.data.data
+        this.openReceiptModal()
+      },
+
       openAddModal () {
         this.isAdd = true
       },

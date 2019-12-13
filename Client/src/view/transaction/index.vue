@@ -16,8 +16,7 @@
       <br>
       <!--表格部分-->
       <div>
-        <Table :columns="columnsList" :data="transactionData" border @on-selection-change="batchSelect"
-               disabled-hover></Table>
+        <Table :columns="columnsList" :data="transactionData" border disabled-hover></Table>
       </div>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
@@ -28,8 +27,7 @@
 
     <!--Addmodal-->
     <Modal v-model="isAdd" @on-cancel="cancelModal" title="发起新交易" width="800">
-      <Form :model="newTransactionForm" ref="newTransactionForm" :rules="rules"
-            :label-width="110">
+      <Form :model="newTransactionForm" ref="newTransactionForm"  :label-width="110">
         <Card>
           <Row>
             <Col span="11">
@@ -63,14 +61,16 @@
             <Row>
               <Col span="11">
                 <FormItem label="交易时间：" prop="time">
-                  <DatePicker type="datetime" ref="time" placeholder="请选择交易时间"
-                              style="width: 227px"></DatePicker>
+                  <Input placeholder="请输入交易时间" clearable v-model="newTransactionForm.creatTime"></Input>
+                  <!-- <DatePicker type="datetime" ref="time" placeholder="请选择交易时间"
+                              style="width: 227px"></DatePicker> -->
                 </FormItem>
               </Col>
               <Col span="11" v-if="transactionMethod==0">
                 <FormItem label="还款时间：" prop="deadline">
-                  <DatePicker type="datetime" ref="deadline" placeholder="请选择还款时间"
-                              style="width: 227px"></DatePicker>
+                   <Input placeholder="请输入还款时间" clearable v-model="newTransactionForm.deadline"></Input>
+                  <!-- <DatePicker type="datetime" ref="deadline" placeholder="请选择还款时间"
+                              style="width: 227px"></DatePicker> -->
                 </FormItem>
               </Col>
               <Col span="11" v-if="transactionMethod==1">
@@ -98,8 +98,7 @@
 
     <!--Settlemodal-->
     <Modal v-model="isSettle" @on-cancel="cancelModal" title="结算" width="800">
-      <Form :model="settleForm" ref="settleForm" :rules="rules"
-            :label-width="110">
+      <Form :model="settleForm" ref="settleForm" :label-width="110">
         <Card>
           <Row>
             <FormItem label="应收账款单据：" prop="receiptId">
@@ -116,16 +115,33 @@
     </Modal>
 
     <!--ReceiptDetailmodal-->
-    <Modal v-model="isSettle" @on-cancel="cancelModal" title="单据详情" width="800">
-      <Form :model="settleForm" ref="settleForm" :rules="rules"
-            :label-width="110">
-        <Card>
-          <Row>
-            <FormItem label="应收账款单据：" prop="receiptId">
-              <Input placeholder="请输入要结算的应收账款单据ID" clearable v-model="settleForm.receiptId"></Input>
-            </FormItem>
-          </Row>
-        </Card>
+    <Modal v-model="isReceipt" @on-cancel="cancelModal" title="应收账款单据详情" width="800">
+      <Form :model="receiptData" ref="receiptData" :label-width="110">
+        <FormItem label="单据ID：" prop="id">
+          <p>{{receiptData.id}}</p>
+        </FormItem>
+        <FormItem label="创建时间：" prop="createTime">
+          <p>{{receiptData.createTime}}</p>
+        </FormItem>
+        <FormItem label="结算日期：" prop="deadline">
+          <p>{{receiptData.deadline}}</p>
+        </FormItem>
+        <FormItem label="总金额：" prop="totalAmount">
+          <p>{{receiptData.totalAmount}}</p>
+        </FormItem>
+        <FormItem label="付款方：" prop="payer">
+          <p>{{receiptData.payer}}</p>
+        </FormItem>
+        <FormItem label="收款方：">
+          <p v-for="(item, index) in receiptData.payees" :key="index">{{item}} : {{ receiptData.amount[index] }} </p>
+        </FormItem>
+        <FormItem label="当前可信度：" prop="creditLevel">
+          <p>{{receiptData.creditLevel}}</p>
+        </FormItem>
+        <FormItem label="状态：" prop="settled">
+          <p v-if="receiptData.settled">已结算</p>
+          <p v-else>尚未结算</p>
+        </FormItem>
       </Form>
       <!--自定义页脚-->
       <div slot="footer">
@@ -181,7 +197,18 @@
           {
             title: '是否结算',
             align: 'center',
-            key: 'settled'
+            key: 'settled',
+            render: (h, params) =>{
+              let settled = "";
+              if(params.row.settled){
+                settled = "已结算"
+              }else{
+                settled = "尚未结算"
+              }
+              return h('span', {
+
+              }, settled)
+            }
           },
           {
             title: '应收账款单据信息',
@@ -200,8 +227,9 @@
                   },
                   on: {
                     click: () => {
-                      let data = Object.assign({}, params.row)
-                      this.openReceiptModal(data)
+                      let id = params.row.receiptId
+                      console.log(id)
+                      this.findReceiptDetail(id)
                     }
                   }
                 }, '查看'),
@@ -236,17 +264,17 @@
     },
 
     methods: {
-
-      findTransactionData () {
-        getTransactionData.then(res => {
-          console.log(res)
-        })
+      async findTransactionData () {
+        let res  = await getTransactionData()
+        this.transactionData = res.data.data
+        console.log(this.transactionData)
       },
 
-      findReceiptDetail () {
-        getTransactionData.then(res => {
-          console.log(res)
-        })
+      async findReceiptDetail (id) {
+        let res = await getReceiptDetail({receiptId: id})
+        console.log(res)
+        this.receiptData = res.data.data
+        this.openReceiptModal()
       },
 
       doReceiptSettle() {
@@ -254,8 +282,6 @@
           console.log(res);
         })
       },
-
-
 
       openAddModal () {
         this.isAdd = true

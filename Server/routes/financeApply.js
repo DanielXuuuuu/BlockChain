@@ -36,10 +36,23 @@ router.get("/list", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
+console.log(ret);
+		    let num = ret.output['id'].length;
+                    let returnData = []
+                    for(let i = 0; i < num; i++){
+                        let temp = {
+                            amount:  ret.output['amount'][i].toString(10),
+                            bank:  ret.output['bank'][i].toString(10),
+                            date:  ret.output['date'][i].toString(10),
+                            id:  ret.output['id'][i].toString(10),
+                            receiptId:  ret.output['receiptId'][i].toString(10),
+                        }
+                        returnData.push(temp)
+                    }
                     res.status(200)
                     res.json({
                         message: "success",
-                        data: ret
+                        data: returnData
                     })
                 });
             } else {

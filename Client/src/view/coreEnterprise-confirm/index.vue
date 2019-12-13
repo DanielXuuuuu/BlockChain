@@ -13,8 +13,7 @@
       <br>
       <!--表格部分-->
       <div>
-        <Table :columns="columnsList" :data="coreEnterpriseData" border @on-selection-change="batchSelect"
-               disabled-hover></Table>
+        <Table :columns="columnsList" :data="coreEnterpriseData" border disabled-hover></Table>
       </div>
       <div style="margin: 10px;overflow: hidden">
         <div style="float: right;">
@@ -25,7 +24,7 @@
 
     <!--Addmodal-->
     <Modal v-model="isAdd" @on-cancel="cancelModal" title="核心企业认证" width="800">
-      <Form :model="addForm" ref="addForm" :rules="rules" :label-width="110">
+      <Form :model="addForm" ref="addForm" :label-width="110">
         <Card>
           <Row>
             <Col span="15">
@@ -52,7 +51,7 @@
 </template>
 
 <script>
-
+  import {getAllEnterprises} from '../../api/enterprise.js'
   export default {
     name: 'transaction',
     components: {},
@@ -102,14 +101,15 @@
     },
 
     created () {
-      // this.findCoreEnterpriseData()
+      this.findCoreEnterpriseData()
     },
 
     methods: {
-      // findCoreEnterpriseData(){
-      //
-      // },
-
+      async findCoreEnterpriseData () {
+        let res  = await getAllEnterprises();
+        this.coreEnterpriseData = res.data.data;
+        console.log(this.coreEnterpriseData)
+      },
       openAddModal () {
         this.isAdd = true
       },

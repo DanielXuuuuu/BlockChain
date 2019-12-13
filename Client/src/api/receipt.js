@@ -1,25 +1,28 @@
 import axios from '@/libs/api.request'
 
-export const getReceiptDetail = (formData) => {
+export const getReceiptDetail = ({receiptId} ) => {
+  const data = {
+    receiptId,
+  }
   return axios.request({
     url: 'api/receipt/detail',
-    formData,
+    data ,
     method: 'post'
   })
 }
 
-export const receiptConfirm = (formData) => {
+export const receiptConfirm = (data ) => {
   return axios.request({
     url: 'api/financeApply/confirm',
-    formData,
+    data ,
     method: 'post'
   })
 }
 
-export const receiptSettle = (formData) => {
+export const receiptSettle = (data ) => {
   return axios.request({
     url: 'api/financeApply/settle',
-    formData,
+    data ,
     method: 'post'
   })
 }

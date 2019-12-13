@@ -18,6 +18,7 @@ router.post("/detail", function(req, res, next){
     let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
     let functionName = "getReceiptInfo";
     let parameters =  [];
+console.log(req.body);
     for(let key in req.body){
         parameters.push(req.body[key]);
     }
@@ -39,10 +40,18 @@ router.post("/detail", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
+                    ret.output['id'] = ret.output['id'].toString(10);
+                    ret.output['totalAmount'] = ret.output['totalAmount'].toString(10);
+		    for(let i = 0; i < ret.output['amount'].length; i++){
+		    	ret.output['amount'][i] = ret.output['amount'][i].toString(10);
+	            }
+                    ret.output['deadline'] = ret.output['deadline'].toString(10);
+                    ret.output['createTime'] = ret.output['createTime'].toString(10);
+                    ret.output['creditLevel'] = ret.output['creditLevel'].toString(10);
                     res.status(200)
                     res.json({
                         message: "success",
-                        data: ret
+                        data: ret.output
                     })
                 });
             } else {
