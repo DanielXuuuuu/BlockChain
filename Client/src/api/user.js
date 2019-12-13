@@ -1,29 +1,32 @@
-import { get, post } from '../libs/http'
+import axios from '@/libs/api.request'
 
-export const registerEnterprise = ({ userName, password }) => {
+export const registerEnterprise = ({ name, properties }) => {
   const data = {
-    userName,
-    password
+    name,
+    properties
   }
   return axios.request({
-    url: 'login',
+    url: 'api/user/registerEnterprise',
     data,
     method: 'post'
   })
 }
 
-export const registerThirdParty = ({ userName, password }) => {
+export const registerThirdParty = ({ name, type }) => {
   const data = {
-    userName,
-    password
+    name,
+    type
   }
   return axios.request({
-    url: 'api',
+    url: 'api/user/registerThirdParty',
     data,
     method: 'post'
   })
 }
 
-export function getUserInfo(params) {
-  return fetch('/api/user/detail', params)
+export const getUserDetail = () => {
+  return axios.request({
+    url: 'api/user/detail',
+    method: 'get'
+  })
 }

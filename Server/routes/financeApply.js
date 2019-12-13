@@ -5,15 +5,14 @@ var express = require('express');
 var querystring =require('querystring');
 
 const { ContractsDir, ContractsOutputDir } = require('../constant');
-const {  getAbi } = require('../interfaces/base');
+const { getAbi } = require('../interfaces/base');
 const utils = require('../nodejs-sdk/packages/api/common/utils');
-const   Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
+const Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
 
 var nodeApi = new Web3jService();
 var router = express.Router();
 
 
-/*********************调用合约api**********************/
 router.get("/list", function(req, res, next){
     let contractName = "hello";
     let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";

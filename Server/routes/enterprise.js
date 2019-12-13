@@ -4,9 +4,9 @@ var url = require('url');
 var express = require('express');
 var querystring =require('querystring');
 
-const {  getAbi } = require('../interfaces/base');
+const { getAbi } = require('../interfaces/base');
 const utils = require('../nodejs-sdk/packages/api/common/utils');
-const  Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
+const Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
 
 var nodeApi = new Web3jService();
 var router = express.Router();

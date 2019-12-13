@@ -131,7 +131,7 @@ contract hello {
     }
 
     // 通过新创建单据的方式发起交易（这里设定由买方发起交易）
-    function TransactionWithNewReceipt(string memory info, uint time, uint amount, uint deadline, address seller) public returns (bool, string memory) {
+    function TransactionWithNewReceipt(address seller, uint amount, uint time, uint deadline, string memory info) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
             return (false, "[ERROR] You need regist your company first.");
         }else{
@@ -167,7 +167,7 @@ contract hello {
     }
 
     // 通过转让单据的方式发起交易（这里设定由买方发起交易）
-    function TransactionByTransferReceipt(string memory info, uint time, uint amount, address seller, uint256 receiptId) public returns (bool, string memory) {
+    function TransactionByTransferReceipt(address seller,  uint amount, uint time, uint256 receiptId, string memory info) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
             return (false, "[ERROR] You need regist your company first.");
         }else if(!receipts[receiptId].exists){
@@ -298,7 +298,7 @@ contract hello {
     }
 
 
-    function findAllEnterpriseAddr() public view returns(bool, uint num, address[] memory, string memory){
+    function findAllEnterprise() public view returns(bool, uint num, address[] memory, string memory){
         address[] memory addrs = new address[](users.length);
         string memory names = "";
         uint count = 0;
@@ -324,7 +324,7 @@ contract hello {
         }
     }
 
-    function findAllBankAddr() public returns(bool, uint num, address[] memory, string memory){
+    function findAllBank() public returns(bool, uint num, address[] memory, string memory){
         address[] memory addrs = new address[](users.length);
         string memory names = "";
         uint count = 0;
@@ -413,7 +413,7 @@ contract hello {
     }
 
     // 登陆企业获取其历史融资记录
-    function getFinancingInfo() public view returns(
+    function getFinancingData() public view returns(
         uint256[] memory id,
         address[] memory bank,
         uint256[] memory receiptId,
@@ -449,5 +449,5 @@ contract hello {
         for (uint i = 0; i < _ba.length; i++)bret[k++] = _ba[i];
         for (i = 0; i < _bb.length; i++) bret[k++] = _bb[i];
         return string(ret);
-   }  
+   }
 }

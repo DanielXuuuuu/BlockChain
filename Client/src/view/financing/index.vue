@@ -72,121 +72,106 @@
 </template>
 
 <script>
-    import {getUserInfo} from '../../api/user.js'
-
-    export default {
-        name: 'transaction',
-        components: {},
-        data: function () {
-            return {
-                // modal控制
-                isAdd: false,
-                isReceipt: false,
-                // 表头数据
-                columnsList: [
-                    {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        title: '银行账户地址',
-                        align: 'center',
-                        key: 'bank'
-                    },
-                    {
-                        title: '融资时间',
-                        align: 'center',
-                        key: 'date'
-                    },
-                    {
-                        title: '融资金额',
-                        align: 'center',
-                        key: 'amount'
-                    },
-                    {
-                        title: '使用的应收账款单据',
-                        align: 'center',
-                        key: 'handle',
-                        width: 200,
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'primary'
-                                    },
-                                    style: {
-                                        marginRight: '5px',
-                                        display: 'inline-block'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            let data = Object.assign({}, params.row)
-                                            this.openReceiptModal(data)
-                                        }
-                                    }
-                                }, '查看'),
-                            ])
-                        }
-                    }
-                ],
-                gettingEnterpriseData: false,
-
-                financingData: [],
-                applyForm: {},
-                transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
-
-                searchOption: {}, // 查询用参数
-                loading: false, // 远程查询时使用
-                loading1: false, // 远程查询时使用
-                loading2: false, // 远程查询时使用
-
-
-                delId: {
-                    ids: ''
-                },
-                page: {
-                    total: 1,
-                    currentPage: 1
-                }
-            }
-        },
-
-        created() {
-          this.getUserData();
-            // this.findSuggestionData()
-        },
-
-        methods: {
-          async getUserData(params){
-            console.log(fuck)
-            let res = await getUserInfo(params);
-            if (res.code === 200) {
-                  
-            } else {
-              this.$Message.error(res.message)
-            }
+  export default {
+    name: 'transaction',
+    components: {},
+    data: function () {
+      return {
+        // modal控制
+        isAdd: false,
+        isReceipt: false,
+        // 表头数据
+        columnsList: [
+          {
+            type: 'selection',
+            width: 60,
+            align: 'center'
           },
-
-            openAddModal() {
-                this.isAdd = true
-            },
-
-            openReceiptModal() {
-                this.isReceipt = true
-            },
-
-            doFinancingApply(){
-
-            },
-
-            cancelModal() {
-                this.isAdd = false
-                this.isReceipt = false
-
+          {
+            title: '银行账户地址',
+            align: 'center',
+            key: 'bank'
+          },
+          {
+            title: '融资时间',
+            align: 'center',
+            key: 'date'
+          },
+          {
+            title: '融资金额',
+            align: 'center',
+            key: 'amount'
+          },
+          {
+            title: '使用的应收账款单据',
+            align: 'center',
+            key: 'handle',
+            width: 200,
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary'
+                  },
+                  style: {
+                    marginRight: '5px',
+                    display: 'inline-block'
+                  },
+                  on: {
+                    click: () => {
+                      let data = Object.assign({}, params.row)
+                      this.openReceiptModal(data)
+                    }
+                  }
+                }, '查看'),
+              ])
             }
+          }
+        ],
+        gettingEnterpriseData: false,
+
+        financingData: [],
+        applyForm: {},
+        transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
+
+        loading: false, // 远程查询时使用
+        loading1: false, // 远程查询时使用
+        loading2: false, // 远程查询时使用
+
+        delId: {
+          ids: ''
+        },
+        page: {
+          total: 1,
+          currentPage: 1
         }
+      }
+    },
+
+    created () {
+      // this.findSuggestionData()
+    },
+
+    methods: {
+      openAddModal () {
+        this.isAdd = true
+      },
+
+      openReceiptModal () {
+        this.isReceipt = true
+      },
+
+      doFinancingApply () {
+
+      },
+
+      cancelModal () {
+        this.isAdd = false
+        this.isReceipt = false
+
+      }
     }
+  }
 
 </script>
 

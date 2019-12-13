@@ -53,78 +53,76 @@
 
 <script>
 
-    export default {
-        name: 'transaction',
-        components: {},
-        data: function () {
-            return {
-                // modal控制
-                isAdd: false,
+  export default {
+    name: 'transaction',
+    components: {},
+    data: function () {
+      return {
+        // modal控制
+        isAdd: false,
 
-                rules: {// 用户表单校验对象
-                },
-
-                // 表头数据
-                columnsList: [
-                    {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        title: '企业名称',
-                        align: 'center',
-                        key: 'name'
-                    },
-                    {
-                        title: '账户地址',
-                        align: 'center',
-                        key: 'address'
-                    }
-                ],
-                gettingEnterpriseData: false,
-
-                coreEnterpriseData: [],
-                addForm: {},
-
-                searchOption: {}, // 查询用参数
-                loading: false, // 远程查询时使用
-                loading1: false, // 远程查询时使用
-                loading2: false, // 远程查询时使用
-
-
-                delId: {
-                    ids: ''
-                },
-                page: {
-                    total: 1,
-                    currentPage: 1
-                }
-            }
+        rules: {// 用户表单校验对象
         },
 
-        created() {
-            // this.findCoreEnterpriseData()
+        // 表头数据
+        columnsList: [
+          {
+            type: 'selection',
+            width: 60,
+            align: 'center'
+          },
+          {
+            title: '企业名称',
+            align: 'center',
+            key: 'name'
+          },
+          {
+            title: '账户地址',
+            align: 'center',
+            key: 'address'
+          }
+        ],
+        gettingEnterpriseData: false,
+
+        coreEnterpriseData: [],
+        addForm: {},
+
+        loading: false, // 远程查询时使用
+        loading1: false, // 远程查询时使用
+        loading2: false, // 远程查询时使用
+
+        delId: {
+          ids: ''
         },
-
-        methods: {
-            // findCoreEnterpriseData(){
-            //
-            // },
-
-            openAddModal(){
-                this.isAdd = true;
-            },
-
-            doConfirm(){
-
-            },
-
-            cancelModal(){
-                this.isAdd = false
-            }
+        page: {
+          total: 1,
+          currentPage: 1
         }
+      }
+    },
+
+    created () {
+      // this.findCoreEnterpriseData()
+    },
+
+    methods: {
+      // findCoreEnterpriseData(){
+      //
+      // },
+
+      openAddModal () {
+        this.isAdd = true
+      },
+
+      doConfirm () {
+
+      },
+
+      cancelModal () {
+        this.isAdd = false
+      }
     }
+  }
 
 </script>
 

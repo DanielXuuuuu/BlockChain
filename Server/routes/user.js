@@ -5,7 +5,7 @@ var router = express.Router();
 var account = new Web3EthAccounts('ws://localhost:20200');
 const {  getAbi } = require('../interfaces/base');
 const utils = require('../nodejs-sdk/packages/api/common/utils');
-const   Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
+const Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
 const { CRUDService, Table, Condition, Entry } = require('../nodejs-sdk/packages/api');
 let crudService = new CRUDService();
 

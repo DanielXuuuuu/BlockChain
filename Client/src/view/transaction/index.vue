@@ -40,31 +40,53 @@
                 </Select>
               </FormItem>
             </Col>
-            <Col span="11">
-              <FormItem label="卖方企业：" prop="seller">
-<!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
-<!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
-<!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
-<!--                    {{option.name}}-->
-<!--                  </Option>-->
-<!--                </Select>-->
-                <Input placeholder="请输入卖方企业地址" clearable v-model="newTransactionForm.seller"></Input>
-              </FormItem>
-            </Col>
           </Row>
-          <Row>
-            <Col span="11">
-              <FormItem label="交易时间：" prop="transactionTime">
-                <DatePicker type="datetime" ref="timeAdd" placeholder="请选择交易时间"
-                            style="width: 227px"></DatePicker>
-              </FormItem>
-            </Col>
-            <Col span="11">
-              <FormItem label="交易内容：" prop="process">
-                <Input placeholder="请输入交易信息" clearable v-model="newTransactionForm.info"></Input>
-              </FormItem>
-            </Col>
-          </Row>
+          <div v-show="transactionMethod">
+            <Row>
+              <Col span="11">
+                <FormItem label="卖方企业：" prop="seller">
+                  <!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
+                  <!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
+                  <!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
+                  <!--                    {{option.name}}-->
+                  <!--                  </Option>-->
+                  <!--                </Select>-->
+                  <Input placeholder="请输入卖方企业地址" clearable v-model="newTransactionForm.seller"></Input>
+                </FormItem>
+              </Col>
+              <Col span="11">
+                <FormItem label="交易金额：" prop="amount">
+                  <Input placeholder="请输入交易金额" clearable v-model="newTransactionForm.amount"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col span="11">
+                <FormItem label="交易时间：" prop="time">
+                  <DatePicker type="datetime" ref="time" placeholder="请选择交易时间"
+                              style="width: 227px"></DatePicker>
+                </FormItem>
+              </Col>
+              <Col span="11" v-if="transactionMethod==0">
+                <FormItem label="还款时间：" prop="deadline">
+                  <DatePicker type="datetime" ref="deadline" placeholder="请选择还款时间"
+                              style="width: 227px"></DatePicker>
+                </FormItem>
+              </Col>
+              <Col span="11" v-if="transactionMethod==1">
+                <FormItem label="应收账款单据：" prop="receiptId">
+                  <Input placeholder="请输入要转让的单据ID" clearable v-model="newTransactionForm.receiptId"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                <FormItem label="交易内容：" prop="info">
+                  <Input placeholder="请输入交易信息" clearable v-model="newTransactionForm.info"></Input>
+                </FormItem>
+              </Col>
+            </Row>
+          </div>
         </Card>
       </Form>
       <!--自定义页脚-->
@@ -80,13 +102,7 @@
             :label-width="110">
         <Card>
           <Row>
-            <FormItem label="应收账款单据ID：" prop="receiptId">
-              <!--                <Select clearable filterable v-model="suggestionAddForm.enterpriseId" placeholder="请输入投诉企业" remote-->
-              <!--                        :remote-method="v=>{remoteMethod(v,'search')}" :loading="loading">-->
-              <!--                  <Option v-for="(option, index) in enterpriseData" :value="option.id.toString()" :key="index">-->
-              <!--                    {{option.name}}-->
-              <!--                  </Option>-->
-              <!--                </Select>-->
+            <FormItem label="应收账款单据：" prop="receiptId">
               <Input placeholder="请输入要结算的应收账款单据ID" clearable v-model="settleForm.receiptId"></Input>
             </FormItem>
           </Row>
@@ -99,135 +115,176 @@
       </div>
     </Modal>
 
+    <!--ReceiptDetailmodal-->
+    <Modal v-model="isSettle" @on-cancel="cancelModal" title="单据详情" width="800">
+      <Form :model="settleForm" ref="settleForm" :rules="rules"
+            :label-width="110">
+        <Card>
+          <Row>
+            <FormItem label="应收账款单据：" prop="receiptId">
+              <Input placeholder="请输入要结算的应收账款单据ID" clearable v-model="settleForm.receiptId"></Input>
+            </FormItem>
+          </Row>
+        </Card>
+      </Form>
+      <!--自定义页脚-->
+      <div slot="footer">
+        <Button type="primary" @click="cancelModal">关闭</Button>
+      </div>
+    </Modal>
+
   </div>
 </template>
 
 <script>
+  import { getTransactionData, TransactionWithNewReceipt, TransactionByTransferReceipt } from '../../api/transaction.js'
+  import { receiptSettle, getReceiptDetail } from '../../api/receipt.js'
+  import { getAllEnterprises } from '../../api/enterprise.js'
 
-    export default {
-        name: 'transaction',
-        components: {},
-        data: function () {
-            return {
-                // modal控制
-                isAdd: false,
-                isReceipt: false,
-                isSettle: false,
+  export default {
+    name: 'transaction',
+    components: {},
+    data: function () {
+      return {
+        // modal控制
+        isAdd: false,
+        isReceipt: false,
+        isSettle: false,
 
-                // 表头数据
-                columnsList: [
-                    {
-                        type: 'selection',
-                        width: 60,
-                        align: 'center'
-                    },
-                    {
-                        title: '卖方',
-                        align: 'center',
-                        key: 'seller'
-                    },
-                    {
-                        title: '买方',
-                        align: 'center',
-                        key: 'buyer'
-                    },
-                    {
-                        title: '交易详情',
-                        align: 'center',
-                        key: 'info'
-                    },
-                    {
-                        title: '交易时间',
-                        align: 'center',
-                        key: 'transactionTime'
-                    },
-                    {
-                        title: '是否结算',
-                        align: 'center',
-                        key: 'settled'
-                    },
-                    {
-                        title: '应收账款单据信息',
-                        align: 'center',
-                        key: 'handle',
-                        width: 200,
-                        render: (h, params) => {
-                            return h('div', [
-                                h('Button', {
-                                    props: {
-                                        type: 'primary'
-                                    },
-                                    style: {
-                                        marginRight: '5px',
-                                        display: 'inline-block'
-                                    },
-                                    on: {
-                                        click: () => {
-                                            let data = Object.assign({}, params.row)
-                                            this.openReceiptModal(data)
-                                        }
-                                    }
-                                }, '查看'),
-                            ])
-                        }
+        // 表头数据
+        columnsList: [
+          {
+            type: 'selection',
+            width: 60,
+            align: 'center'
+          },
+          {
+            title: '卖方',
+            align: 'center',
+            key: 'seller'
+          },
+          {
+            title: '买方',
+            align: 'center',
+            key: 'buyer'
+          },
+          {
+            title: '交易详情',
+            align: 'center',
+            key: 'info'
+          },
+          {
+            title: '交易时间',
+            align: 'center',
+            key: 'transactionTime'
+          },
+          {
+            title: '是否结算',
+            align: 'center',
+            key: 'settled'
+          },
+          {
+            title: '应收账款单据信息',
+            align: 'center',
+            key: 'handle',
+            width: 200,
+            render: (h, params) => {
+              return h('div', [
+                h('Button', {
+                  props: {
+                    type: 'primary'
+                  },
+                  style: {
+                    marginRight: '5px',
+                    display: 'inline-block'
+                  },
+                  on: {
+                    click: () => {
+                      let data = Object.assign({}, params.row)
+                      this.openReceiptModal(data)
                     }
-                ],
-                gettingEnterpriseData: false,
-
-                transactionData: [],
-                newTransactionForm: {},
-                settleForm: {},
-                transactionMethod: 0, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
-
-                // searchOption: {}, // 查询用参数
-                // loading: false, // 远程查询时使用
-                // loading1: false, // 远程查询时使用
-                // loading2: false, // 远程查询时使用
-
-                delId: {
-                    ids: ''
-                },
-                page: {
-                    total: 1,
-                    currentPage: 1
-                }
+                  }
+                }, '查看'),
+              ])
             }
+          }
+        ],
+        gettingEnterpriseData: false,
+
+        transactionData: [],
+        receiptData: {},
+        newTransactionForm: {},
+        settleForm: {},
+        transactionMethod: null, // 记录发起新的交易方式，0表示创建新单据，1表示转让已有单据
+
+        loading: false, // 远程查询时使用
+        loading1: false, // 远程查询时使用
+        loading2: false, // 远程查询时使用
+
+        delId: {
+          ids: ''
         },
-
-        created() {
-            // this.findTransactionData()
-        },
-
-        methods: {
-
-            openAddModal() {
-                this.isAdd = true
-            },
-
-            openReceiptModal() {
-                this.isReceipt = true
-            },
-
-            openSettleModal(){
-                this.isSettle = true
-            },
-
-            doCreateNewTransaction(){
-
-            },
-
-            doSettleReceipt(){
-
-            },
-
-            cancelModal() {
-                this.isAdd = false
-                this.isReceipt = false
-                this.isSettle = false
-
-            }
+        page: {
+          total: 1,
+          currentPage: 1
         }
+      }
+    },
+
+    created () {
+      this.findTransactionData()
+    },
+
+    methods: {
+
+      findTransactionData () {
+        getTransactionData.then(res => {
+          console.log(res)
+        })
+      },
+
+      findReceiptDetail () {
+        getTransactionData.then(res => {
+          console.log(res)
+        })
+      },
+
+      doReceiptSettle() {
+        receiptSettle().then(res => {
+          console.log(res);
+        })
+      },
+
+
+
+      openAddModal () {
+        this.isAdd = true
+      },
+
+      openReceiptModal () {
+        this.isReceipt = true
+      },
+
+      openSettleModal () {
+        this.isSettle = true
+      },
+
+      doCreateNewTransaction () {
+
+      },
+
+      doSettleReceipt () {
+
+      },
+
+      cancelModal () {
+        this.isAdd = false
+        this.isReceipt = false
+        this.isSettle = false
+        this.transactionMethod = null
+      }
     }
+  }
 
 </script>
 
