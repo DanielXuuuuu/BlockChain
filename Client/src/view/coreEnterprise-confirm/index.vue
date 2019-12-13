@@ -84,7 +84,7 @@
                         key: 'isCore',
                         render: (h, params) => {
                             let type = "";
-                            if (params.row.isCore) {
+                            if (params.row.isCore=="1") {
                                 type = "核心企业"
                             } else {
                                 type = "普通企业"
@@ -118,14 +118,20 @@
 
         methods: {
             async findCoreEnterpriseData() {
-                let res = await getAllEnterprises();
-                this.coreEnterpriseData = res.data.data;
+                let res = await getAllEnterprises()
+                this.coreEnterpriseData = res.data.data
                 console.log(this.coreEnterpriseData)
             },
 
             async doConfirm() {
-                let res = await coreEnterpriseIdentifiy(this.addForm);
-                this.findCoreEnterpriseData()
+                let res = await coreEnterpriseIdentifiy(this.addForm)
+                if(res.data.message == "success"){
+                  this.$Message.success("认证成功")
+                  this.findCoreEnterpriseData()
+                }else{
+                  this.$Message.error("认证失败")
+                }
+                this.cancelModal()
             },
 
             openAddModal() {

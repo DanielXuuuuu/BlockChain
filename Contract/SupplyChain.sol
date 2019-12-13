@@ -1,6 +1,6 @@
 pragma solidity ^0.4.23;
 
-contract hello {
+contract SupplyChain {
 
     /*------------------------------------------ 结构体定义 --------------------------------------------*/
 
@@ -101,9 +101,9 @@ contract hello {
             enterprises[msg.sender].property = property;
             enterprises[msg.sender].exists = true;
             users.push(msg.sender);
-            return (true, "[INFO] Regist an enterprise successfully.");
+            return (true, "Regist an enterprise successfully.");
         }else{
-            return (false, "[ERROR] You have registed.");
+            return (false, "You have registed.");
         }
     }
 
@@ -112,9 +112,9 @@ contract hello {
         if(!thirdParties[msg.sender].exists){
             thirdParties[msg.sender] = ThirdParty(name, tType, true);
             users.push(msg.sender);
-            return (true, "[INFO] Regist a thirdParty successfully.");
+            return (true, "Regist a thirdParty successfully.");
         }else{
-            return (false, "[ERROR] You have registed.");
+            return (false, "You have registed.");
         }
     }
 
@@ -122,19 +122,19 @@ contract hello {
     // 核心企业认定功能
     function coreEnterpriseIdentifiy(address enterpriseAddr) public returns (bool, string memory){
         if(!thirdParties[msg.sender].exists){
-            return (false, "[ERROR] You don't have right to announce a core enterprise.");
+            return (false, "You don't have right to announce a core enterprise.");
         }else if(!enterprises[enterpriseAddr].exists){
-            return (false, "[ERROR] Enterprise doesn't exist.");
+            return (false, "Enterprise doesn't exist.");
         }else{
             enterprises[enterpriseAddr].eType = EnterpriseType.core;
-            return (true, "[INFO] That enterprise is core enterprise now.");
+            return (true, "That enterprise is core enterprise now.");
         }
     }
 
     // 通过新创建单据的方式发起交易（这里设定由买方发起交易）
     function TransactionWithNewReceipt(address seller, uint amount, uint time, uint deadline, string memory info) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
-            return (false, "[ERROR] You need regist your company first.");
+            return (false, "You need regist your company first.");
         }else{
             uint256 transactionId = uint256(keccak256(abi.encodePacked(msg.sender, seller, amount, now)));
             // 创建单据，生成一个单据Id
@@ -160,9 +160,9 @@ contract hello {
                 receipts[receiptId].exists = true;
                 // 应收账款单据创建事件触发
                 emit ReceiptCreateEvent(receiptId, msg.sender, seller, amount);
-                return (true, "[INFO] Create a new transaction successfully.");
+                return (true, "Create a new transaction successfully.");
             }else{
-                return (false, "[ERROR] Create receipt failed.");
+                return (false, "Create receipt failed.");
             }
         }
     }
@@ -170,15 +170,15 @@ contract hello {
     // 通过转让单据的方式发起交易（这里设定由买方发起交易）
     function TransactionByTransferReceipt(address seller,  uint amount, uint time, uint256 receiptId, string memory info) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
-            return (false, "[ERROR] You need regist your company first.");
+            return (false, "You need regist your company first.");
         }else if(!receipts[receiptId].exists){
-            return (false, "[ERROR] Receipt doesn't exist.");
+            return (false, "Receipt doesn't exist.");
         }else if(receipts[receiptId].payInfo[msg.sender] == 0){
-            return (false, "[ERROR] Your have no right to transfer this receipt.");
+            return (false, "Your have no right to transfer this receipt.");
         }else if(receipts[receiptId].settled){
-            return (false, "[ERROR] Receipt is out of date.");
+            return (false, "Receipt is out of date.");
         }else if(receipts[receiptId].payInfo[msg.sender] < amount){
-            return (false, "[WARNNING] Transfer failed, amount limited.");
+            return (false, "Transfer failed, amount limited.");
         }else{
             // 创建交易
             uint256 transactionId = uint256(keccak256(abi.encodePacked(msg.sender, seller, amount, now)));
@@ -194,7 +194,7 @@ contract hello {
             receipts[receiptId].payInfo[seller] += amount;
             receipts[receiptId].timing[seller] = time;
             emit ReceiptTransferEvent(receiptId, msg.sender, seller, amount);
-            return (true, "[INFO] Transfer successfully.");
+            return (true, "Transfer successfully.");
         }
     }
 
@@ -217,20 +217,20 @@ contract hello {
     // 目前实现:应收账款单据的creditLevel要大于2才能通过融资申请
     function finance(uint256 receiptId, address bankAddr, uint amount, uint date) public returns (bool, string memory) {
         if(!enterprises[msg.sender].exists){
-            return (false, "[ERROR] You need regist your company first.");
+            return (false, "You need regist your company first.");
         }else if(!receipts[receiptId].exists){
-            return (false, "[ERROR] Receipt doesn't exist.");
+            return (false, "Receipt doesn't exist.");
         }else if(receipts[receiptId].settled){
-            return (false, "[ERROR] Receipt is out of date.");
+            return (false, "Receipt is out of date.");
         }else if(enterprises[receipts[receiptId].payer].eType != EnterpriseType.core){
             // 验证应收账款单据有否是由核心企业签发的
-            return (false, "[ERROR] Sorry, the bank refuses your financing request.");
+            return (false, "Sorry, the bank refuses your financing request.");
         }else if(receipts[receiptId].creditLevel < 2){
             // 交易可信度需要 >= 3
-            return (false, "[ERROR] Sorry, the bank refuses your financing request.");
+            return (false, "Sorry, the bank refuses your financing request.");
         }else if(receipts[receiptId].payInfo[msg.sender] < amount){
             // 验证是否有还款能力
-            return (false, "[ERROR] Sorry, the bank refuses your financing request.");
+            return (false, "Sorry, the bank refuses your financing request.");
         }else{
             // 生成一个融资Id
             uint256 financingId = uint256(keccak256(abi.encodePacked(msg.sender, amount, now)));
@@ -241,9 +241,9 @@ contract hello {
 
                 enterprises[msg.sender].financings.push(financingId);
                 emit FinanceAccpetEvent(financingId, msg.sender, bankAddr, amount);
-                return (true, "[INFO] Financing successfully.");
+                return (true, "Financing successfully.");
             }else{
-                return (false, "[ERROR] Financing exists.");
+                return (false, "Financing exists.");
             }
         }
     }
@@ -251,11 +251,11 @@ contract hello {
     // 结算
     function settlement(uint256 receiptId) public returns (bool, string memory) {
         if(receipts[receiptId].settled){
-            return (false, "[ERROR] The receipt already settled.");
+            return (false, "The receipt already settled.");
         }else if(!receipts[receiptId].exists){
-            return (false, "[ERROR] Receipt doesn't exists.");
+            return (false, "Receipt doesn't exists.");
         }else if(receipts[receiptId].payer != msg.sender){
-            return (false, "[ERROR] You don't need to pay anything for this receipt.");
+            return (false, "You don't need to pay anything for this receipt.");
         }else{
             uint totalAmount = 0;
             // 扣款
@@ -272,7 +272,7 @@ contract hello {
             }
 
             emit TransactionSettleEvent(receiptId, receipts[receiptId].payer, receipts[receiptId].payees);
-            return (true, "[INFO] Transaction settles.");
+            return (true, "Transaction settles.");
         }
     }
 
@@ -294,24 +294,24 @@ contract hello {
                 return (true, 4, thirdParties[msg.sender].name);
             }
         }else{
-            return (false, 0, "[ERROR] Please register first!");
+            return (false, 0, "Please register first!");
         }
     }
 
 
-    function findAllEnterprise() public view returns(bool, uint num, address[] memory, string memory, uint memory tType){
+    function findAllEnterprise() public view returns(bool, uint num, address[] memory, string memory, uint[] memory){
         address[] memory addrs = new address[](users.length);
-        uint[] memory tType = new uint[](users.length);
+        uint[] memory isCore = new uint[](users.length);
         string memory names = "";
         uint count = 0;
         for(uint i = 0; i < users.length; i++){
             address addr = users[i];
             if(enterprises[addr].exists){
                 addrs[count] = addr;
-                if(enterprises[addr].tType == EnterpriseType.core){
-                    tType[count] = 1;
+                if(enterprises[addr].eType == EnterpriseType.core){
+                    isCore[count] = 1;
                 }else{
-                    tType[count] = 0;
+                    isCore[count] = 0;
                 }
                 // 字符串拼接
                 if(count == 0){
@@ -324,10 +324,10 @@ contract hello {
             }
         }
         if(count == 0){
-            return (false, 0, addrs, names);
+            return (false, 0, addrs, names, isCore);
         }
         else{
-            return (true, count, addrs, names);
+            return (true, count, addrs, names, isCore);
         }
     }
 

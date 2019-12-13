@@ -15,7 +15,7 @@ var router = express.Router();
 
 /* 部署合约 */
 router.get("/deploy", function(req, res, next){
-    let contractName = "hello";
+    let contractName = "SupplyChain";
     if (!contractName.endsWith('.sol')) {
         contractName += '.sol';
     }

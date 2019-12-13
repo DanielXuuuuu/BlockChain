@@ -106,7 +106,7 @@
 </template>
 
 <script>
-    import {getAllfinanceApply} from '../../api/financeApply.js'
+    import {getAllfinanceApply, addApply} from '../../api/financeApply.js'
     import {getReceiptDetail} from '../../api/receipt.js'
 
     export default {
@@ -204,9 +204,14 @@
             },
 
             async doFinancingApply() {
-                let res = await getReceiptDetail(this.applyForm)
-
-                this.findFinanceData()
+                let res = await addApply(this.applyForm)
+                if(res.data.message == "success"){
+                  this.$Message.success("融资成功")
+                  this.findFinanceData()
+                }else{
+                  this.$Message.error("融资失败")
+                }
+                this.cancelModal()
             },
 
             openAddModal() {

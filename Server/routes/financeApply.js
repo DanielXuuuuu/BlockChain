@@ -12,11 +12,10 @@ const Web3jService = require('../nodejs-sdk/packages/api/web3j').Web3jService;
 var nodeApi = new Web3jService();
 var router = express.Router();
 
-
 router.get("/list", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
-    let functionName = "getFinancingInfo";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
+    let functionName = "getFinancingData";
     let parameters =  [];
 
     let abi = getAbi(contractName);
@@ -27,6 +26,7 @@ router.get("/list", function(req, res, next){
         functionName = utils.spliceFunctionSignature(item);
 
         if (item.constant) {
+
             nodeApi.call(contractAddress, functionName, parameters).then(result => {
                 let status = result.result.status;
                 let ret = {
@@ -79,8 +79,8 @@ console.log(ret);
 });
 
 router.post("/add", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "finance";
     let parameters =  [];
     for(let key in req.body){
@@ -104,11 +104,19 @@ router.post("/add", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(ret.output['0'] == "true"){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             } else {
                 nodeApi.sendRawTransaction(contractAddress, functionName, parameters).then(result => {
@@ -122,11 +130,19 @@ router.post("/add", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             }
         }

@@ -16,7 +16,7 @@ export const receiptConfirm = ({receiptId}) => {
     receiptId,
   }
   return axios.request({
-    url: 'api/financeApply/confirm',
+    url: 'api/receipt/confirm',
     data ,
     method: 'post'
   })
@@ -27,7 +27,7 @@ export const receiptSettle = ({receiptId}) => {
     receiptId,
   }
   return axios.request({
-    url: 'api/financeApply/settle',
+    url: 'api/receipt/settle',
     data ,
     method: 'post'
   })

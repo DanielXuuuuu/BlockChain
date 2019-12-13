@@ -13,8 +13,8 @@ var nodeApi = new Web3jService();
 var router = express.Router();
 
 router.get("/list", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "getEnterpriseAllTransaction";
     let parameters =  [];
 
@@ -36,6 +36,7 @@ router.get("/list", function(req, res, next){
                         ret.output = utils.decodeMethod(item, output);
                     }
                     console.log(ret.output);
+		
                     ret.output['info'] = ret.output['info'].split(",")
                     let num = ret.output['receiptId'].length;
                     let returnData = []
@@ -84,8 +85,8 @@ router.get("/list", function(req, res, next){
 });
 
 router.post("/createNewReceipt", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "TransactionWithNewReceipt";
     let parameters =  [];
     for(let key in req.body){
@@ -106,15 +107,24 @@ router.post("/createNewReceipt", function(req, res, next){
                 let ret = {
                     status: status
                 };
+		console.log(ret);
                     let output = result.result.output;
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(ret.output['0'] == "true"){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             } else {
                 nodeApi.sendRawTransaction(contractAddress, functionName, parameters).then(result => {
@@ -128,11 +138,19 @@ router.post("/createNewReceipt", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             }
         }
@@ -140,8 +158,8 @@ router.post("/createNewReceipt", function(req, res, next){
 });
 
 router.post("/transferReceipt", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "TransactionByTransferReceipt";
     let parameters =  [];
     for(let key in req.body){
@@ -165,11 +183,19 @@ router.post("/transferReceipt", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(ret.output['0'] == "true"){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             } else {
                 nodeApi.sendRawTransaction(contractAddress, functionName, parameters).then(result => {
@@ -183,11 +209,19 @@ router.post("/transferReceipt", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             }
         }

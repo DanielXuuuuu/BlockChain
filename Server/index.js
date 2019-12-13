@@ -13,7 +13,7 @@ const config = new Configuration();
 console.log(config.account)
 console.log(config.privateKey)
 
-var contratRouter = require('./routes/contrat');
+var contractRouter = require('./routes/contract');
 var userRouter = require('./routes/user');
 var enterpriseRouter = require('./routes/enterprise');
 var financeApplyRouter = require('./routes/financeApply');
@@ -37,7 +37,7 @@ app.all('*',function(req,res,next) {
 })
 
 // 合约相关接口
-app.use('/api/contrat', contratRouter);
+app.use('/api/contract', contractRouter);
 app.use('/api/user', userRouter);
 app.use('/api/enterprise', enterpriseRouter);
 app.use('/api/financeApply', financeApplyRouter);

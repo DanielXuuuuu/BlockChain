@@ -14,8 +14,8 @@ var router = express.Router();
 
 
 router.post("/detail", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "getReceiptInfo";
     let parameters =  [];
 console.log(req.body);
@@ -78,8 +78,8 @@ console.log(req.body);
 });
 
 router.post("/confirm", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "confirmReceipt";
     let parameters =  [];
     for(let key in req.body){
@@ -133,8 +133,8 @@ router.post("/confirm", function(req, res, next){
 });
 
 router.post("/settle", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "settlement";
     let parameters =  [];
     for(let key in req.body){
@@ -158,11 +158,19 @@ router.post("/settle", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(ret.output['0'] == "true"){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             } else {
                 nodeApi.sendRawTransaction(contractAddress, functionName, parameters).then(result => {
@@ -176,11 +184,19 @@ router.post("/settle", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             }
         }

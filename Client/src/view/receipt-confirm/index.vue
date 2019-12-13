@@ -56,9 +56,12 @@
 
             async doConfirm() {
                 let res = await receiptConfirm(this.addForm)
-                if (res.code == 200) {
-                    this.$Message.success("认证交易成功，单据可信度提升！")
+                if(res.data.message == "success"){
+                  this.$Message.success("认证成功")
+                }else{
+                  this.$Message.error("认证失败")
                 }
+                this.cancelModal()
             },
 
             cancelModal() {

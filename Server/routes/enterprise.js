@@ -12,8 +12,8 @@ var nodeApi = new Web3jService();
 var router = express.Router();
 
 router.get("/list", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "findAllEnterprise";
     let parameters =  [];
 
@@ -76,8 +76,8 @@ router.get("/list", function(req, res, next){
 });
 
 router.post("/coreEnterpriseIdentifiy", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "coreEnterpriseIdentifiy";
     let parameters =  [];
     for(let key in req.body){
@@ -101,11 +101,19 @@ router.post("/coreEnterpriseIdentifiy", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             } else {
                 nodeApi.sendRawTransaction(contractAddress, functionName, parameters).then(result => {
@@ -119,11 +127,19 @@ router.post("/coreEnterpriseIdentifiy", function(req, res, next){
                     if (output !== '0x') {
                         ret.output = utils.decodeMethod(item, output);
                     }
-                    res.status(200)
-                    res.json({
-                        message: "success",
-                        data: ret
-                    })
+                    if(!ret.output['0']){
+                        res.status(200)
+                        res.json({
+                            message: "failed",
+                            data: ret
+                        })
+                    }else{
+                        res.status(200)
+                        res.json({
+                            message: "success",
+                            data: ret
+                        })
+                    }
                 });
             }
         }

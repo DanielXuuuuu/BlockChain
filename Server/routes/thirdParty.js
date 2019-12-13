@@ -12,8 +12,8 @@ var nodeApi = new Web3jService();
 var router = express.Router();
 
 router.get("/listBank", function(req, res, next){
-    let contractName = "hello";
-    let contractAddress ="0x11c1e8248f54398b6f8fbc9d28468dba222b75dd";
+    let contractName = "SupplyChain";
+    let contractAddress ="0x4b112b3117688989b47ba84798c57b28604c0739";
     let functionName = "findAllBank";
     let parameters =  [];
 

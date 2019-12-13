@@ -117,31 +117,33 @@
     <!--ReceiptDetailmodal-->
     <Modal v-model="isReceipt" @on-cancel="cancelModal" title="应收账款单据详情" width="800">
       <Form :model="receiptData" ref="receiptData" :label-width="110">
-        <FormItem label="单据ID：" prop="id">
-          <p>{{receiptData.id}}</p>
-        </FormItem>
-        <FormItem label="创建时间：" prop="createTime">
-          <p>{{receiptData.createTime}}</p>
-        </FormItem>
-        <FormItem label="结算日期：" prop="deadline">
-          <p>{{receiptData.deadline}}</p>
-        </FormItem>
-        <FormItem label="总金额：" prop="totalAmount">
-          <p>{{receiptData.totalAmount}}</p>
-        </FormItem>
-        <FormItem label="付款方：" prop="payer">
-          <p>{{receiptData.payer}}</p>
-        </FormItem>
-        <FormItem label="收款方：">
-          <p v-for="(item, index) in receiptData.payees" :key="index">{{item}} : {{ receiptData.amount[index] }} </p>
-        </FormItem>
-        <FormItem label="当前可信度：" prop="creditLevel">
-          <p>{{receiptData.creditLevel}}</p>
-        </FormItem>
-        <FormItem label="状态：" prop="settled">
-          <p v-if="receiptData.settled">已结算</p>
-          <p v-else>尚未结算</p>
-        </FormItem>
+        <Card>
+          <FormItem label="单据ID：" prop="id">
+            <p>{{receiptData.id}}</p>
+          </FormItem>
+          <FormItem label="创建时间：" prop="createTime">
+            <p>{{receiptData.createTime}}</p>
+          </FormItem>
+          <FormItem label="结算日期：" prop="deadline">
+            <p>{{receiptData.deadline}}</p>
+          </FormItem>
+          <FormItem label="总金额：" prop="totalAmount">
+            <p>{{receiptData.totalAmount}}</p>
+          </FormItem>
+          <FormItem label="付款方：" prop="payer">
+            <p>{{receiptData.payer}}</p>
+          </FormItem>
+          <FormItem label="收款方：">
+            <p v-for="(item, index) in receiptData.payees" :key="index">{{item}} : {{ receiptData.amount[index] }} </p>
+          </FormItem>
+          <FormItem label="当前可信度：" prop="creditLevel">
+            <p>{{receiptData.creditLevel}}</p>
+          </FormItem>
+          <FormItem label="状态：" prop="settled">
+            <p v-if="receiptData.settled">已结算</p>
+            <p v-else>尚未结算</p>
+          </FormItem>
+        </Card>
       </Form>
       <!--自定义页脚-->
       <div slot="footer">
@@ -282,8 +284,13 @@
 
             async doReceiptSettle() {
                 let res = await receiptSettle(this.settleForm)
-
-                this.findTransactionData()
+                if(res.data.message == "success"){
+                  this.$Message.success("结算成功")
+                  this.findTransactionData()
+                }else{
+                  this.$Message.error("结算失败")
+                }
+                this.cancelModal()
             },
 
             doCreateTransaction() {
@@ -296,12 +303,24 @@
 
             async doCreateNewTransaction() {
                 let res = await TransactionWithNewReceipt(this.newTransactionForm)
-                this.findTransactionData()
+                if(res.data.message == "success"){
+                  this.$Message.success("交易成功")
+                  this.findTransactionData()
+                }else{
+                  this.$Message.error("交易失败")
+                }
+                this.cancelModal()
             },
 
             async doTransferReceipt() {
                 let res = await TransactionByTransferReceipt(this.newTransactionForm)
-                this.findTransactionData()
+                if(res.data.message == "success"){
+                  this.$Message.success("交易成功")
+                  this.findTransactionData()
+                }else{
+                  this.$Message.error("交易失败")
+                }
+                this.cancelModal()
             },
 
             openAddModal() {

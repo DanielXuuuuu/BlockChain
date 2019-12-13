@@ -1,11 +1,10 @@
 <template>
   <div style="height: 100%;">
     <Card style="height: 100%;">
-      <h1 slot="title">供应链金融</h1>
-      <h2 style="margin-bottom: 100px;">这是一个供应链金融供应链解决方法</h2>
+      <img src="https://raw.githubusercontent.com/FISCO-BCOS/FISCO-BCOS/master/docs/images/FISCO_BCOS_Logo.svg?sanitize=true">
+      <h1 id="title">基于FISCO-BCOS的供应链金融平台</h1>
       <div v-if="unRegister">
-        <p>您的公司/机构尚未登记</p>
-        <br>
+        <h1>您的公司/机构尚未登记</h1>
         <Row style="text-align: center;">
           <Col>
             <Button type="primary" style="width: 150px;" @click="openEnterpriseModal">
@@ -33,8 +32,8 @@
               </FormItem>
             </Col>
             <Col span="11">
-              <FormItem label="现有资产：" prop="property">
-                <Input placeholder="请输入公司资产数额" clearable v-model="registerForm.property"></Input>
+              <FormItem label="现有资产：" prop="properties">
+                <Input placeholder="请输入公司资产数额" clearable v-model="registerForm.properties"></Input>
               </FormItem>
             </Col>
           </Row>
@@ -107,13 +106,26 @@
             },
             async doEnterpriseRegister() {
                 let res = await registerEnterprise(this.registerForm)
-                this.getUserData()
+                if(res.status == 200){
+                  this.$Message.success("注册成功")
+                  this.getUserData()
+                }else{
+                  this.$Message.error("注册失败")
+                }
+                this.cancelModal()
             },
 
             async doThridPartyRegister() {
                 let res = await registerThirdParty(this.registerForm)
-                this.getUserData()
+                if(res.status == 200){
+                  this.$Message.success("注册成功")
+                  this.getUserData()
+                }else{
+                  this.$Message.error("注册失败")
+                }
+                this.cancelModal()
             },
+
             openEnterpriseModal() {
                 this.isEnterprise = true
             },
@@ -133,8 +145,21 @@
 </script>
 
 <style scoped>
-  h1, h2, p {
-    text-align: center;
-    color: black;
+h1{
+  text-align: center;
+  color: black;
+  line-height: 100px;
+  vertical-align: middle;
+}
+
+#title{
+  font-size: 45px;
+  clear: left;
+  margin-bottom: 30px;
+}
+
+  img{
+    float: left;
+    width: 300px;
   }
 </style>
